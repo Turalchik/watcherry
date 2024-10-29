@@ -1,0 +1,23 @@
+<!-- movies/templates/movies/home.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+    <h1>Популярные фильмы</h1>
+    <ul>
+        {% for movie in popular_movies %}
+            <li>{{ movie.title }} - {{ movie.rating }}</li>
+        {% endfor %}
+    </ul>
+
+    <h1>Новые фильмы</h1>
+    <ul>
+        {% for movie in new_movies %}
+            <li>{{ movie.title }} - {{ movie.release_year }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
