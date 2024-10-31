@@ -1,0 +1,35 @@
+/* watcherry/static/css/styles.css */
+body {
+    font-family: Arial, sans-serif; /* Установка шрифта для всего документа */
+    background-color: #f0f0f0; /* Цвет фона страницы */
+    margin: 0; /* Убираем отступы */
+    padding: 0; /* Убираем внутренние отступы */
+}
+
+header {
+    background-color: #007bff; /* Цвет фона для заголовка */
+    color: white; /* Цвет текста заголовка */
+    padding: 10px; /* Внутренние отступы для заголовка */
+    text-align: center; /* Центрируем текст в заголовке */
+}
+
+main {
+    padding: 20px; /* Внутренние отступы для основного содержимого */
+}
+
+h1, h2 {
+    margin-bottom: 15px; /* Отступы снизу для заголовков */
+}
+
+button {
+    background-color: #28a745; /* Цвет кнопки */
+    color: white; /* Цвет текста кнопки */
+    border: none; /* Убираем границу */
+    padding: 10px 15px; /* Внутренние отступы для кнопки */
+    cursor: pointer; /* Указатель при наведении на кнопку */
+}
+
+button:hover {
+    background-color: #218838; /* Цвет кнопки при наведении */
+}
+
