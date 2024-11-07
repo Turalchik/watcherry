@@ -17,10 +17,13 @@ class Actor(models.Model):
 class Movie(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    release_year = models.IntegerField()
+    release_year = models.IntegerField(null=True, blank=True)
     genres = models.ManyToManyField(Genre)
     actors = models.ManyToManyField(Actor)
     rating = models.FloatField(default=0.0)
+    votes = models.IntegerField(default=0)
+    title_id = models.CharField(max_length=20)
+    poster_url = models.URLField(max_length=500, null=True, blank=True)  # Поле для URL постера
 
     def __str__(self):
         return self.title
