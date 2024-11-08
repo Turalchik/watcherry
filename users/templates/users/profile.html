@@ -13,10 +13,24 @@
     </header>
 
     <main>
+        <!-- Отображение аватара -->
+        <section>
+            <h2>Ваш аватар</h2>
+            <img src="{{ user.profile.avatar.url }}" alt="Аватар" width="150" height="150">
+        </section>
+
         <section>
             <h2>Информация профиля</h2>
             <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
+        </section>
+
+        <!-- Форма для загрузки нового аватара -->
+        <section>
+            <form method="POST" enctype="multipart/form-data" id="avatar-form">
+                {% csrf_token %}
+                <input type="file" name="avatar" id="avatar" style="display: none;" /> <!-- Скрытое поле для загрузки файла -->
+                <button type="button" onclick="document.getElementById('avatar').click();">Изменить аватар</button> <!-- Кнопка для выбора аватара -->
+            </form>
         </section>
 
         <section>
@@ -29,6 +43,16 @@
         <section>
             <a href="{% url 'home' %}">Вернуться на главную страницу</a>
         </section>
+
+        <script>
+            // Обработчик для изменения аватара
+            document.getElementById('avatar').addEventListener('change', function() {
+                // Отправляем форму, если файл выбран
+                if (this.files && this.files[0]) {
+                    document.getElementById('avatar-form').submit();
+                }
+            });
+        </script>
     </main>
 </body>
 </html>
