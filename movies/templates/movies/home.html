@@ -1,4 +1,3 @@
-<!-- movies/templates/movies/home.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,13 +8,15 @@
     <h1>Добро пожаловать на Watcherry!</h1>
     <a href="{% url 'profile' %}">Перейти в личный кабинет</a> <!-- Ссылка на профиль -->
     
-    <!-- movies/templates/movies/home.html -->
     <h2>Популярные фильмы</h2>
     <ul>
         {% for movie in popular_movies %}
             <li>
-                <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster" style="width:100px; height:auto;">
-                {{ movie.title }} - {{ movie.votes }} голосов
+                <!-- Ссылка на страницу фильма по постеру -->
+                <a href="{% url 'movie_detail' title_id=movie.title_id %}">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster" style="width:100px; height:auto;">
+                </a>
+                <a href="{% url 'movie_detail' title_id=movie.title_id %}">{{ movie.title }}</a> - {{ movie.votes }} голосов                
             </li>
         {% endfor %}
     </ul>
@@ -24,8 +25,11 @@
     <ul>
         {% for movie in new_movies %}
             <li>
-                <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster" style="width:100px; height:auto;">
-                {{ movie.title }} - {{ movie.release_year }}
+                <!-- Ссылка на страницу фильма по постеру -->
+                <a href="{% url 'movie_detail' title_id=movie.title_id %}">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster" style="width:100px; height:auto;">
+                </a>
+                <a href="{% url 'movie_detail' title_id=movie.title_id %}">{{ movie.title }}</a> - {{ movie.release_year }}                
             </li>
         {% endfor %}
     </ul>
