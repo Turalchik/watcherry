@@ -6,12 +6,9 @@ from django.contrib import messages
 from django.contrib.auth import login
 from .forms import ProfileUpdateForm
 from .models import Profile
+from movies.models import Movie
 
 
-@login_required
-def profile(request):
-    # Создаст страницу profile.html в users/templates/users/
-    return render(request, 'users/profile.html')  
 
 def register(request):
     if request.method == 'POST':              # 1. Проверка метода запроса
@@ -26,19 +23,27 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})  # 9. Рендер шаблона
 
 @login_required
-# Представление для отображения и обновления профиля
 def profile(request):
     user = request.user
     # Проверка на наличие профиля, если его нет - создаем
     if not hasattr(user, 'profile'):
         Profile.objects.create(user=user)
 
-    if request.method == 'POST':  # Если метод POST, значит, пользователь отправил форму
-        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
-        if form.is_valid():  # Проверяем, прошла ли форма валидацию
-            form.save()  # Сохраняем изменения
-            return redirect('profile')  # Перенаправляем пользователя на страницу профиля
-    else:
-        form = ProfileUpdateForm(instance=request.user.profile)  # Заполняем форму данными пользователя
+    reviews = user.reviews.all()  # Получаем все отзывы пользователя
 
-    return render(request, 'users/profile.html', {'form': form})
+    # Получаем фильмы, на которые оставлены отзывы пользователем
+    movies_with_reviews = Movie.objects.filter(review__user=user).distinct()
+
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    else:
+        form = ProfileUpdateForm(instance=request.user.profile)
+
+    return render(request, 'users/profile.html', {
+        'form': form,
+        'reviews': reviews,
+        'movies_with_reviews': movies_with_reviews  # Передаем фильмы в шаблон
+    })

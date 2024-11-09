@@ -1,16 +1,47 @@
+<!-- movie_detail.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ movie.title }}</title>
+    <title>{{ movie.title }} - Детали фильма</title>
 </head>
 <body>
     <h1>{{ movie.title }}</h1>
-    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} Poster">
-    <p><strong>Year:</strong> {{ movie.release_year }}</p>
-    <p><strong>Genres:</strong> {% for genre in movie.genres.all %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-    <p><strong>Rating:</strong> {{ movie.rating }} ({{ movie.votes }} votes)</p>
-    <p><strong>Description:</strong> {{ movie.description }}</p>
-    <p><strong>Actors:</strong> {% for actor in movie.actors.all %}{{ actor.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+    <p><strong>Год выпуска:</strong> {{ movie.release_year }}</p>
+    <p><strong>Описание:</strong> {{ movie.description }}</p>
+
+    <!-- Отображение постера фильма -->
+    {% if movie.poster_url %}
+        <img src="{{ movie.poster_url }}" alt="Постер фильма {{ movie.title }}" style="max-width: 300px;">
+    {% else %}
+        <p>Постер не доступен.</p>
+    {% endif %}
+
+    <h2>Отзывы</h2>
+    {% if movie.reviews.all %}
+        <ul>
+            {% for review in movie.reviews.all %}
+                <li>
+                    <p><strong>{{ review.user.username }}:</strong> {{ review.rating }} / 10</p>
+                    <p>{{ review.text }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Нет отзывов для этого фильма.</p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <h3>Оставить отзыв:</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}  <!-- Отображение формы отзыва -->
+            <button type="submit">Отправить отзыв</button>
+        </form>
+    {% else %}
+        <p>Чтобы оставить отзыв, необходимо <a href="{% url 'login' %}">войти</a>.</p>
+    {% endif %}
+
+    <a href="{% url 'home' %}">На главную</a>
 </body>
 </html>

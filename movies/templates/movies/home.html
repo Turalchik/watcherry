@@ -3,35 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <style>
+        /* Добавление стилей для отображения фильмов в строку */
+        .movie-list {
+            display: flex;
+            flex-wrap: wrap; /* Перенос элементов на новую строку, если они не помещаются */
+            gap: 20px; /* Промежуток между элементами */
+        }
+
+        .movie-item {
+            text-align: center;
+            width: 150px; /* Ограничение ширины каждого элемента */
+        }
+
+        .movie-item img {
+            width: 100px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .movie-item a {
+            display: block;
+            margin-top: 5px;
+        }
+    </style>
 </head>
 <body>
     <h1>Добро пожаловать на Watcherry!</h1>
     <a href="{% url 'profile' %}">Перейти в личный кабинет</a> <!-- Ссылка на профиль -->
     
     <h2>Популярные фильмы</h2>
-    <ul>
+    <div class="movie-list">
         {% for movie in popular_movies %}
-            <li>
+            <div class="movie-item">
                 <!-- Ссылка на страницу фильма по постеру -->
                 <a href="{% url 'movie_detail' title_id=movie.title_id %}">
-                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster" style="width:100px; height:auto;">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster">
                 </a>
-                <a href="{% url 'movie_detail' title_id=movie.title_id %}">{{ movie.title }}</a> - {{ movie.votes }} голосов                
-            </li>
+                <a href="{% url 'movie_detail' title_id=movie.title_id %}">{{ movie.title }}</a> - {{ movie.votes }} голосов
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 
     <h2>Новые фильмы</h2>
-    <ul>
+    <div class="movie-list">
         {% for movie in new_movies %}
-            <li>
+            <div class="movie-item">
                 <!-- Ссылка на страницу фильма по постеру -->
                 <a href="{% url 'movie_detail' title_id=movie.title_id %}">
-                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster" style="width:100px; height:auto;">
+                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster">
                 </a>
-                <a href="{% url 'movie_detail' title_id=movie.title_id %}">{{ movie.title }}</a> - {{ movie.release_year }}                
-            </li>
+                <a href="{% url 'movie_detail' title_id=movie.title_id %}">{{ movie.title }}</a> - {{ movie.release_year }}
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 </body>
 </html>
