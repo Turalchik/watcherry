@@ -1,10 +1,9 @@
-# movies/views.py
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Movie, Review
+from .models import Movie, Review, Comment
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .forms import ReviewForm
+from .forms import ReviewForm, CommentForm, ReplyForm
 from django.contrib import messages
 
 
@@ -23,32 +22,90 @@ def home(request):
 
 @login_required
 def movie_detail(request, title_id):
-    movie = Movie.objects.get(title_id=title_id)  # Получаем фильм по title_id
+    # Получаем фильм с использованием select_related и prefetch_related
+    movie = get_object_or_404(
+        Movie.objects.select_related('director').prefetch_related(
+            'actors', 'producers', 'reviews__user', 'reviews__comments__user', 'reviews__comments__replies__user'
+        ),
+        title_id=title_id
+    )
+    
+    # Получаем все отзывы для фильма
+    reviews = movie.reviews.all()
 
-    # Проверяем, есть ли уже отзыв от текущего пользователя
-    existing_review = Review.objects.filter(user=request.user, movie=movie).first()
+    # Проверка, оставил ли пользователь отзыв
+    user_has_reviewed = movie.reviews.filter(user=request.user).exists()
+
+    # Инициализируем формы
+    form = ReviewForm()
+    comment_form = CommentForm()
+    reply_form = ReplyForm()  # форма для подкомментариев
 
     if request.method == 'POST':
-        if existing_review:
-            messages.warning(request, "Вы уже оставили отзыв для этого фильма.")
-            return redirect('movie_detail', title_id=movie.title_id)
-        
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.user = request.user  # Присваиваем текущего пользователя
-            review.movie = movie  # Привязываем отзыв к фильму
-            review.save()
-            messages.success(request, "Ваш отзыв был добавлен!")
-            return redirect('movie_detail', title_id=movie.title_id)
-    else:
-        form = ReviewForm()
+        # Обработка отзыва
+        if 'review' in request.POST and not user_has_reviewed:
+            form = ReviewForm(request.POST)
+            if form.is_valid():
+                review = form.save(commit=False)
+                review.user = request.user
+                review.movie = movie
+                review.save()
+                messages.success(request, "Ваш отзыв был добавлен!")
+                return redirect('movie_detail', title_id=movie.title_id)
 
+        # Обработка комментария
+        elif 'comment' in request.POST:
+            review_id = request.POST.get('review_id')
+            review = get_object_or_404(Review, id=review_id)
+            parent_id = request.POST.get('parent_id')
+            parent_comment = None
+            if parent_id:
+                parent_comment = get_object_or_404(Comment, id=parent_id)
+
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.user = request.user
+                comment.review = review  # Связываем комментарий с отзывом
+                comment.parent = parent_comment
+                comment.save()
+                messages.success(request, "Ваш комментарий был добавлен!")
+                return redirect('movie_detail', title_id=movie.title_id)
+
+        # Обработка подкомментария (ответа)
+        elif 'reply' in request.POST:
+            reply_form = ReplyForm(request.POST)
+            if reply_form.is_valid():
+                comment_id = request.POST.get('comment_id')
+                comment = get_object_or_404(Comment, id=comment_id)
+                reply = reply_form.save(commit=False)
+                reply.user = request.user
+                reply.parent = comment
+                # Связываем подкомментарий с отзывом, если родительский комментарий связан с отзывом
+                if comment.review:
+                    reply.review = comment.review  # Устанавливаем отзыв для подкомментария
+                reply.save()
+                messages.success(request, "Ваш подкомментарий был добавлен!")
+                return redirect('movie_detail', title_id=movie.title_id)
+    else:
+        # Пустые формы для начальной загрузки
+        form = ReviewForm()
+        comment_form = CommentForm()
+
+    # Передаем все данные в шаблон
     return render(request, 'movies/movie_detail.html', {
         'movie': movie,
         'form': form,
-        'existing_review': existing_review  # Передаем существующий отзыв, если он есть
+        'reviews': reviews,
+        'user_has_reviewed': user_has_reviewed,
+        'actors': movie.actors.all(),
+        'director': movie.director,
+        'producers': movie.producers.all(),
+        'comment_form': comment_form,
+        'reply_form': reply_form,  # передаем форму для подкомментариев
     })
+
+
 
 @login_required
 def add_review(request, title_id):
@@ -68,3 +125,19 @@ def add_review(request, title_id):
     return render(request, 'movies/add_review.html', {'form': form, 'movie': movie})
 
 
+
+def add_review(request, title_id):
+    movie = get_object_or_404(Movie, title_id=title_id)
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.movie = movie
+            review.user = request.user
+            review.save()
+            return HttpResponseRedirect(reverse('movie_detail', args=[title_id]))
+    else:
+        form = ReviewForm()
+
+    return render(request, 'movies/add_review.html', {'form': form, 'movie': movie})

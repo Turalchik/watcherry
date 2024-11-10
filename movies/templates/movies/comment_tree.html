@@ -1,0 +1,24 @@
+<div class="comment">
+    <p><strong>{{ comment.user.username }}:</strong> {{ comment.text }}</p>
+
+    <!-- Рекурсивно отображаем ответы с отступом для вложенных комментариев -->
+    {% if comment.replies.exists %}
+        <div class="replies" style="margin-left: 20px;">
+            {% for reply in comment.replies.all %}
+                {% include "movies/comment_tree.html" with comment=reply %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Форма для добавления ответа -->
+    {% if user.is_authenticated %}
+        <form method="post" style="margin-top: 5px;">
+            {% csrf_token %}
+            <input type="hidden" name="comment_id" value="{{ comment.id }}">
+            {{ reply_form.as_p }}
+            <button type="submit" name="reply">Ответить</button>
+        </form>
+    {% else %}
+        <p>Чтобы ответить, необходимо <a href="{% url 'login' %}">войти</a>.</p>
+    {% endif %}
+</div>

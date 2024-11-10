@@ -1,4 +1,3 @@
-<!-- movie_detail.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,42 +5,123 @@
     <title>{{ movie.title }} - Детали фильма</title>
 </head>
 <body>
-    <h1>{{ movie.title }}</h1>
-    <p><strong>Год выпуска:</strong> {{ movie.release_year }}</p>
-    <p><strong>Описание:</strong> {{ movie.description }}</p>
+    <header>
+        <h1>{{ movie.title }}</h1>
+        <p><strong>Описание:</strong> {{ movie.description }}</p>
+        <p><strong>Дата выпуска:</strong> {{ movie.release_date }}</p>
+        <p><strong>Год выпуска:</strong> {{ movie.release_year }}</p>
+        <p><strong>Рейтинг:</strong> {{ movie.rating }}</p>
+        <p><strong>Количество голосов:</strong> {{ movie.votes }}</p>
+        
+        {% if movie.poster_url %}
+            <img src="{{ movie.poster_url }}" alt="Постер фильма {{ movie.title }}" style="max-width: 300px;">
+        {% else %}
+            <p>Постер не доступен.</p>
+        {% endif %}
+    </header>
 
-    <!-- Отображение постера фильма -->
-    {% if movie.poster_url %}
-        <img src="{{ movie.poster_url }}" alt="Постер фильма {{ movie.title }}" style="max-width: 300px;">
-    {% else %}
-        <p>Постер не доступен.</p>
-    {% endif %}
+    <main>
+        <!-- Секция для актеров -->
+        <section>
+            <h2>Актеры</h2>
+            {% if movie.actors.all %}
+                <ul>
+                    {% for actor in movie.actors.all %}
+                        <li>{{ actor.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Нет информации о актерах.</p>
+            {% endif %}
+        </section>
 
-    <h2>Отзывы</h2>
-    {% if movie.reviews.all %}
-        <ul>
-            {% for review in movie.reviews.all %}
-                <li>
-                    <p><strong>{{ review.user.username }}:</strong> {{ review.rating }} / 10</p>
-                    <p>{{ review.text }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Нет отзывов для этого фильма.</p>
-    {% endif %}
+        <!-- Секция для режиссера -->
+        <section>
+            <h2>Режиссер</h2>
+            {% if movie.directors.all %}
+                <ul>
+                    {% for director in movie.directors.all %}
+                        <li>{{ director.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Нет информации о режиссере.</p>
+            {% endif %}
+        </section>
 
-    {% if user.is_authenticated %}
-        <h3>Оставить отзыв:</h3>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}  <!-- Отображение формы отзыва -->
-            <button type="submit">Отправить отзыв</button>
-        </form>
-    {% else %}
-        <p>Чтобы оставить отзыв, необходимо <a href="{% url 'login' %}">войти</a>.</p>
-    {% endif %}
+        <!-- Секция для продюсеров -->
+        <section>
+            <h2>Продюсеры</h2>
+            {% if movie.producers.all %}
+                <ul>
+                    {% for producer in movie.producers.all %}
+                        <li>{{ producer.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Нет информации о продюсерах.</p>
+            {% endif %}
+        </section>
 
-    <a href="{% url 'home' %}">На главную</a>
+        <!-- Секция для отзывов -->
+        <!-- Раздел отзывов -->
+        <section>
+            <h2>Отзывы</h2>
+            {% if reviews %}
+                <ul>
+                    {% for review in reviews %}
+                        <li>
+                            <p><strong>{{ review.user.username }}:</strong> {{ review.rating }} / 10</p>
+                            <p>{{ review.text }}</p>
+                            
+                            <!-- Комментарии к этому отзыву -->
+                            <div class="comments">
+                                {% for comment in review.comments.all %}
+                                    {% if not comment.parent %}  <!-- Отображаем только корневые комментарии -->
+                                        {% include 'movies/comment_tree.html' with comment=comment %}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <!-- Форма добавления комментария -->
+                            {% if user.is_authenticated %}
+                                <form method="post" style="margin-top: 10px;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="review_id" value="{{ review.id }}">
+                                    {{ comment_form.as_p }}
+                                    <button type="submit" name="comment">Добавить комментарий</button>
+                                </form>
+                            {% else %}
+                                <p>Чтобы оставить комментарий, необходимо <a href="{% url 'login' %}">войти</a>.</p>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Нет отзывов для этого фильма.</p>
+            {% endif %}
+        </section>
+
+        <!-- Форма для оставления отзыва -->
+        <section>
+            {% if user.is_authenticated %}
+                {% if user_has_reviewed %}
+                    <p>Вы уже оставили отзыв для этого фильма.</p>
+                {% else %}
+                    <h3>Оставить отзыв:</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}  <!-- форма для отзыва -->
+                        <button type="submit" name="review">Отправить отзыв</button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <p>Чтобы оставить отзыв, необходимо <a href="{% url 'login' %}">войти</a>.</p>
+            {% endif %}
+        </section>
+
+        <!-- Ссылка на главную страницу -->
+        <a href="{% url 'home' %}">На главную</a>
+    </main> 
 </body>
 </html>

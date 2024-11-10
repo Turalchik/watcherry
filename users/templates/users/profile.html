@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Личный кабинет</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}"> <!-- Подключение CSS -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
     <header>
@@ -23,8 +23,8 @@
         <section>
             <form method="POST" enctype="multipart/form-data" id="avatar-form">
                 {% csrf_token %}
-                <input type="file" name="avatar" id="avatar" style="display: none;" /> <!-- Скрытое поле для загрузки файла -->
-                <button type="button" onclick="document.getElementById('avatar').click();">Изменить аватар</button> <!-- Кнопка для выбора аватара -->
+                <input type="file" name="avatar" id="avatar" style="display: none;" />
+                <button type="button" onclick="document.getElementById('avatar').click();">Изменить аватар</button>
             </form>
         </section>
 
@@ -39,40 +39,6 @@
             <a href="{% url 'home' %}">Вернуться на главную страницу</a>
         </section>
 
-        <!-- Информация о профиле и отзывах -->
-        <section>
-            <h2>Мои отзывы:</h2>
-            {% if reviews %}
-                <ul>
-                    {% for review in reviews %}
-                        <li>
-                            <p>{{ review.text }}</p>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>Вы еще не оставили ни одного отзыва.</p>
-            {% endif %}
-        </section>
-
-        <!-- Фильмы, на которые оставлены отзывы -->
-        <section>
-            <h2>Фильмы, на которые вы оставили отзывы:</h2>
-            {% if movies_with_reviews %}
-                <ul>
-                    {% for movie in movies_with_reviews %}
-                        <li>
-                            <h3>{{ movie.title }}</h3>
-                            <p>{{ movie.description }}</p>
-                            <a href="{% url 'add_review' title_id=movie.title_id %}">Оставить новый отзыв</a> <!-- Ссылка для оставления отзыва -->
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>Вы не оставляли отзывы на фильмы.</p>
-            {% endif %}
-        </section>
-
         <!-- Форма обновления профиля -->
         <section>
             <form method="post" enctype="multipart/form-data">
@@ -80,6 +46,23 @@
                 {{ form.as_p }}
                 <button type="submit">Обновить профиль</button>
             </form>
+        </section>
+
+        <!-- Отзывы пользователя -->
+        <section>
+            <h2>Ваши отзывы</h2>
+            {% if reviews %}
+                <ul>
+                    {% for review in reviews %}
+                        <li>
+                            <strong>{{ review.movie.title }}</strong>: {{ review.content }}
+                            <a href="{% url 'movie_detail' review.movie.title_id %}">Перейти к фильму</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>У вас нет отзывов.</p>
+            {% endif %}
         </section>
 
         <script>
