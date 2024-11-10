@@ -41,7 +41,7 @@ def profile(request):
     for movie in movies_with_reviews:
         review = movie.reviews.filter(user=user).first()
         if review:
-            movie_reviews[movie.id] = review  # Сохраняем целый объект отзыва
+            movie_reviews[movie] = review.id
 
     # Если запрос POST, обрабатываем форму для обновления профиля
     if request.method == 'POST':
@@ -57,10 +57,9 @@ def profile(request):
         'form': form,
         'reviews': reviews,
         'movies_with_reviews': movies_with_reviews,  # Фильмы с отзывами
-        'movie_reviews': movie_reviews,  # Словарь с отзывами
+        'movie_reviews': movie_reviews,  # Словарь с ID отзывов
     }
 
     return render(request, 'users/profile.html', context)
-
 
 
