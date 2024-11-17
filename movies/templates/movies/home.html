@@ -31,8 +31,14 @@
 </head>
 <body>
     <h1>Добро пожаловать на Watcherry!</h1>
+
+    <form method="get" action="{% url 'search_movies' %}" class="search-form">
+        <input type="text" name="q" placeholder="Поиск фильмов...">
+        <button type="submit">Найти</button>
+    </form>
+
     <a href="{% url 'profile' %}">Перейти в личный кабинет</a> <!-- Ссылка на профиль -->
-    
+
     <h2>Популярные фильмы</h2>
     <div class="movie-list">
         {% for movie in popular_movies %}

@@ -33,3 +33,24 @@ button:hover {
     background-color: #218838; /* Цвет кнопки при наведении */
 }
 
+.search-form {
+    display: flex;
+    margin-bottom: 20px;
+}
+.search-form input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px;
+}
+.search-form button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007BFF;
+    color: white;
+    cursor: pointer;
+    border-radius: 0 4px 4px 0;
+}
+.search-form button:hover {
+    background-color: #0056b3;
+}

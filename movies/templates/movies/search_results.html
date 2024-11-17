@@ -1,0 +1,50 @@
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* Добавление стилей для отображения фильмов в строку */
+        .movie-list {
+            display: flex;
+            flex-wrap: wrap; /* Перенос элементов на новую строку, если они не помещаются */
+            gap: 20px; /* Промежуток между элементами */
+        }
+
+        .movie-item {
+            text-align: center;
+            width: 150px; /* Ограничение ширины каждого элемента */
+        }
+
+        .movie-item img {
+            width: 100px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .movie-item a {
+            display: block;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Результаты поиска</h1>
+    {% if query %}
+        <p>Результаты для запроса: "{{ query }}"</p>
+        <div class="movie-list">
+            {% for movie in movies %}
+                <div class="movie-item">
+                    <a href="{% url 'movie_detail' title_id=movie.title_id %}">
+                        <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster">
+                    </a>
+                    <a href="{% url 'movie_detail' title_id=movie.title_id %}">{{ movie.title }}</a>
+                </div>
+            {% empty %}
+                <p>Фильмы не найдены.</p>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Введите запрос для поиска.</p>
+    {% endif %}
+    {% endblock %}
+</body>

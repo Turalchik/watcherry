@@ -7,17 +7,18 @@
 <body>
     <header>
         <h1>{{ movie.title }}</h1>
-        <p><strong>Описание:</strong> {{ movie.description }}</p>
-        <p><strong>Дата выпуска:</strong> {{ movie.release_date }}</p>
-        <p><strong>Год выпуска:</strong> {{ movie.release_year }}</p>
-        <p><strong>Рейтинг:</strong> {{ movie.rating }}</p>
-        <p><strong>Количество голосов:</strong> {{ movie.votes }}</p>
         
         {% if movie.poster_url %}
             <img src="{{ movie.poster_url }}" alt="Постер фильма {{ movie.title }}" style="max-width: 300px;">
         {% else %}
             <p>Постер не доступен.</p>
         {% endif %}
+        
+        <p><strong>Жанр:</strong> {{ movie.genres.all|join:", " }}</p>
+        <p><strong>Год выпуска:</strong> {{ movie.release_year }}</p>
+        <p><strong>Рейтинг:</strong> {{ movie.rating }}</p>
+        <p><strong>Количество голосов:</strong> {{ movie.votes }}</p>
+        <p><strong>Продолжительность:</strong> {{ movie.duration }} минут</p>
     </header>
 
     <main>
@@ -35,9 +36,9 @@
             {% endif %}
         </section>
 
-        <!-- Секция для режиссера -->
+        <!-- Секция для режиссеров -->
         <section>
-            <h2>Режиссер</h2>
+            <h2>Режиссеры</h2>
             {% if movie.directors.all %}
                 <ul>
                     {% for director in movie.directors.all %}
@@ -45,7 +46,7 @@
                     {% endfor %}
                 </ul>
             {% else %}
-                <p>Нет информации о режиссере.</p>
+                <p>Нет информации о режиссерах.</p>
             {% endif %}
         </section>
 
@@ -63,8 +64,7 @@
             {% endif %}
         </section>
 
-        <!-- Секция для отзывов -->
-        <!-- Раздел отзывов -->
+        <!-- Секция для отзывов и комментариев -->
         <section>
             <h2>Отзывы</h2>
             {% if reviews %}
@@ -73,11 +73,11 @@
                         <li>
                             <p><strong>{{ review.user.username }}:</strong> {{ review.rating }} / 10</p>
                             <p>{{ review.text }}</p>
-                            
+
                             <!-- Комментарии к этому отзыву -->
                             <div class="comments">
                                 {% for comment in review.comments.all %}
-                                    {% if not comment.parent %}  <!-- Отображаем только корневые комментарии -->
+                                    {% if not comment.parent %}
                                         {% include 'movies/comment_tree.html' with comment=comment %}
                                     {% endif %}
                                 {% endfor %}
@@ -111,7 +111,7 @@
                     <h3>Оставить отзыв:</h3>
                     <form method="post">
                         {% csrf_token %}
-                        {{ form.as_p }}  <!-- форма для отзыва -->
+                        {{ form.as_p }}
                         <button type="submit" name="review">Отправить отзыв</button>
                     </form>
                 {% endif %}

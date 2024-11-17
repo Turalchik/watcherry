@@ -11,35 +11,47 @@ class Genre(models.Model):
         return self.name
 
 class Actor(models.Model):
-    name = models.CharField(max_length=100)
+    name_id = models.CharField(max_length=16, unique=True)
+    name = models.CharField(max_length=255, null=True)
 
     def __str__(self):
-        return self.name
+        return self.name_id if self.name_id else "Unnamed Actor"
     
     
 class Director(models.Model):
-    name = models.CharField(max_length=255)
+    name_id = models.CharField(max_length=16, unique=True)
+    name = models.CharField(max_length=255, null=True)
 
     def __str__(self):
         return self.name
+    
 
+class Writer(models.Model):
+    name_id = models.CharField(max_length=16, unique=True)
+    name = models.CharField(max_length=255, null=True)
+
+    def __str__(self):
+        return self.name
+    
 
 class Producer(models.Model):
-    name = models.CharField(max_length=255)
+    name_id = models.CharField(max_length=16, unique=True)
+    name = models.CharField(max_length=255, null=True)
 
     def __str__(self):
         return self.name
 
 class Movie(models.Model):
     title = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
     release_year = models.IntegerField(null=False, default=1900)
     genres = models.ManyToManyField('Genre', related_name='movies')
     actors = models.ManyToManyField(Actor, related_name='movies')
-    director = models.ForeignKey(Director, on_delete=models.SET_NULL, null=True, related_name='movies')  # Для одного режиссера
+    directors = models.ManyToManyField(Director, related_name='movies') 
     producers = models.ManyToManyField(Producer, related_name='movies')
+    writers = models.ManyToManyField(Writer, related_name='movie')
     rating = models.FloatField(null=True, blank=True)
     votes = models.IntegerField(null=True, blank=True)
+    duration = models.IntegerField(null=True, blank=True)
     title_id = models.CharField(max_length=10, unique=True)
     poster_url = models.URLField(blank=True, null=True)
 

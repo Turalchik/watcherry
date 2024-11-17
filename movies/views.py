@@ -20,12 +20,17 @@ def home(request):
     })
 
 
-@login_required
+def search_movies(request):
+    query = request.GET.get('q')  # Получаем запрос из строки поиска
+    movies = Movie.objects.filter(title__icontains=query) if query else Movie.objects.none()  # Поиск или пустой список
+    return render(request, 'movies/search_results.html', {'movies': movies, 'query': query})
+
+
 def movie_detail(request, title_id):
-    # Получаем фильм с использованием select_related и prefetch_related
+    # Получаем фильм с использованием prefetch_related
     movie = get_object_or_404(
-        Movie.objects.select_related('director').prefetch_related(
-            'actors', 'producers', 'reviews__user', 'reviews__comments__user', 'reviews__comments__replies__user'
+        Movie.objects.prefetch_related(
+            'directors', 'actors', 'producers', 'reviews__user', 'reviews__comments__user', 'reviews__comments__replies__user'
         ),
         title_id=title_id
     )
@@ -87,10 +92,6 @@ def movie_detail(request, title_id):
                 reply.save()
                 messages.success(request, "Ваш подкомментарий был добавлен!")
                 return redirect('movie_detail', title_id=movie.title_id)
-    else:
-        # Пустые формы для начальной загрузки
-        form = ReviewForm()
-        comment_form = CommentForm()
 
     # Передаем все данные в шаблон
     return render(request, 'movies/movie_detail.html', {
@@ -99,7 +100,7 @@ def movie_detail(request, title_id):
         'reviews': reviews,
         'user_has_reviewed': user_has_reviewed,
         'actors': movie.actors.all(),
-        'director': movie.director,
+        'director': movie.directors,
         'producers': movie.producers.all(),
         'comment_form': comment_form,
         'reply_form': reply_form,  # передаем форму для подкомментариев
@@ -108,24 +109,6 @@ def movie_detail(request, title_id):
 
 
 @login_required
-def add_review(request, title_id):
-    movie = get_object_or_404(Movie, title_id=title_id)
-
-    if request.method == 'POST':
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.movie = movie
-            review.user = request.user
-            review.save()
-            return HttpResponseRedirect(reverse('movie_detail', args=[title_id]))
-    else:
-        form = ReviewForm()
-
-    return render(request, 'movies/add_review.html', {'form': form, 'movie': movie})
-
-
-
 def add_review(request, title_id):
     movie = get_object_or_404(Movie, title_id=title_id)
 
