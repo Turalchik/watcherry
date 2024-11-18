@@ -7,10 +7,11 @@ __pycache__/
 *.tsv
 *.sqlite3
 
-# Исключаем папки миграций, lib и bin
+# Исключаем папки миграций, lib, bin и staticfiles
 migrations/
 lib/
 bin/
+staticfiles/
 
 # Игнорируем другие системные файлы
 *.log
@@ -25,3 +26,4 @@ bin/
 # Игнорируем изображения
 *.jpg
 *.png
+
