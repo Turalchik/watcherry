@@ -15,7 +15,7 @@ class Actor(models.Model):
     name = models.CharField(max_length=255, null=True)
 
     def __str__(self):
-        return self.name_id if self.name_id else "Unnamed Actor"
+        return self.name if self.name else "Unnamed Actor"
     
     
 class Director(models.Model):

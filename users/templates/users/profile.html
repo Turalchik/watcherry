@@ -61,6 +61,17 @@
                     <p>У вас пока нет понравившихся фильмов.</p>
                 {% endfor %}
             </ul>
+
+            <h2>Рекомендованные фильмы</h2>
+            <ul>
+                {% for movie in recommendations %}
+                    <li>
+                        <a href="{% url 'movie_detail' movie.title_id %}">{{ movie.title }}</a>
+                    </li>
+                {% empty %}
+                    <p>Рекомендаций пока нет.</p>
+                {% endfor %}
+            </ul>
             
             <h2>Ваши отзывы</h2>
             {% if reviews %}
