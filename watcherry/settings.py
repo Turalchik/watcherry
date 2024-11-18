@@ -120,11 +120,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Указываем путь к папке static
+    BASE_DIR / "static"  # Указываем путь к папке static
 ]
 LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = 'profile'
 LOGOUT_REDIRECT_URL = '/'  # Перенаправление на главную страницу после выхода
 
 

@@ -37,20 +37,110 @@ button:hover {
     display: flex;
     margin-bottom: 20px;
 }
+
 .search-form input[type="text"] {
-    flex: 1;
     padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px 0 0 4px;
+    border-radius: 0; /* Убираем скругления, чтобы форма была прямоугольной */
 }
+
 .search-form button {
     padding: 10px 20px;
     border: none;
     background-color: #007BFF;
     color: white;
     cursor: pointer;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0; /* Прямые углы для кнопки */
 }
-.search-form button:hover {
-    background-color: #0056b3;
+
+/* Верхняя полоса */
+.navbar {
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.navbar-left,
+.navbar-center,
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+/* Название сайта */
+.site-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Поисковая строка */
+.search-bar {
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+    width: 300px;
+}
+
+.search-button {
+    padding: 5px 10px;
+    font-size: 14px;
+    background-color: #444;
+    color: #fff;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #666;
+}
+
+/* Ссылки для входа и профиля */
+.user-link,
+.login-link,
+.logout-link {
+    margin-left: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.user-link:hover,
+.login-link:hover,
+.logout-link:hover {
+    text-decoration: underline;
+}
+
+.movie-list {
+    display: flex;
+    flex-wrap: wrap; /* Перенос элементов на новую строку, если они не помещаются */
+    gap: 20px; /* Промежуток между элементами */
+}
+
+.movie-item {
+    text-align: center;
+    width: 150px; /* Ограничение ширины каждого элемента */
+}
+
+.movie-item img {
+    width: 100px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.movie-item a {
+    display: block;
+    margin-top: 5px;
 }
