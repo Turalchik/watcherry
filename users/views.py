@@ -52,12 +52,15 @@ def profile(request):
     else:
         form = ProfileUpdateForm(instance=request.user.profile)
 
+    liked_movies = request.user.profile.liked_movies.all()
+    
     # Добавляем все данные в контекст
     context = {
         'form': form,
         'reviews': reviews,
         'movies_with_reviews': movies_with_reviews,  # Фильмы с отзывами
         'movie_reviews': movie_reviews,  # Словарь с ID отзывов
+        'liked_movies': liked_movies,
     }
 
     return render(request, 'users/profile.html', context)

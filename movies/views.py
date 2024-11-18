@@ -106,6 +106,17 @@ def movie_detail(request, title_id):
         'reply_form': reply_form,  # передаем форму для подкомментариев
     })
 
+@login_required
+def toggle_like(request, title_id):
+    movie = get_object_or_404(Movie, title_id=title_id)
+    profile = request.user.profile
+
+    if movie in profile.liked_movies.all():
+        profile.liked_movies.remove(movie)  # Удаляем фильм из списка
+    else:
+        profile.liked_movies.add(movie)  # Добавляем фильм в список
+
+    return redirect('movie_detail', title_id=title_id) 
 
 
 @login_required

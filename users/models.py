@@ -6,7 +6,7 @@ from movies.models import Movie
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to='avatars/', default='avatars/default.jpg')
-    movies = models.ManyToManyField(Movie)
+    liked_movies = models.ManyToManyField(Movie, related_name='liked_by', blank=True) 
 
     def __str__(self):
         return f'{self.user.username} Profile'

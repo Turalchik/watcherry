@@ -64,6 +64,19 @@
             {% endif %}
         </section>
 
+        <section>
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'toggle_like' movie.title_id %}">
+                    {% csrf_token %}
+                    {% if movie in user.profile.liked_movies.all %}
+                        <button type="submit" class="btn btn-danger">Удалить из понравившихся</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-success">Добавить в понравившиеся</button>
+                    {% endif %}
+                </form>
+            {% endif %}
+        </section>
+
         <!-- Секция для отзывов и комментариев -->
         <section>
             <h2>Отзывы</h2>

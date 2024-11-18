@@ -50,6 +50,18 @@
 
         <!-- Отзывы пользователя -->
         <section>
+
+            <h2>Понравившиеся фильмы</h2>
+            <ul>
+                {% for movie in liked_movies %}
+                    <li>
+                        <a href="{% url 'movie_detail' movie.title_id %}">{{ movie.title }}</a>
+                    </li>
+                {% empty %}
+                    <p>У вас пока нет понравившихся фильмов.</p>
+                {% endfor %}
+            </ul>
+            
             <h2>Ваши отзывы</h2>
             {% if reviews %}
                 <ul>
