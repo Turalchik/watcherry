@@ -78,6 +78,9 @@ class Comment(models.Model):
     review = models.ForeignKey(Review, related_name='comments', on_delete=models.CASCADE)
     parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    deleted = models.BooleanField(default=False)  # Флаг, указывающий, был ли комментарий удален
 
     def __str__(self):
+        if self.deleted:
+            return f"Комментарий удален администратором"
         return f"Комментарий от {self.user} к отзыву {self.review.id}"

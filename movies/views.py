@@ -93,6 +93,16 @@ def movie_detail(request, title_id):
                 messages.success(request, "Ваш подкомментарий был добавлен!")
                 return redirect('movie_detail', title_id=movie.title_id)
 
+        # Обработка удаления комментария
+        elif 'delete_comment' in request.POST:
+            comment_id = request.POST.get('comment_id')
+            comment = get_object_or_404(Comment, id=comment_id)
+            if request.user.profile.role == 'admin':
+                comment.deleted = True  # Устанавливаем флаг "удалено"
+                comment.save()
+                messages.success(request, "Комментарий удален администратором.")
+            return redirect('movie_detail', title_id=movie.title_id)
+
     # Передаем все данные в шаблон
     return render(request, 'movies/movie_detail.html', {
         'movie': movie,
