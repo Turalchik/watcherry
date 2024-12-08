@@ -39,7 +39,7 @@ def movie_detail(request, title_id):
     reviews = movie.reviews.all()
 
     # Проверка, оставил ли пользователь отзыв
-    user_has_reviewed = movie.reviews.filter(user=request.user).exists()
+    user_has_reviewed = movie.reviews.filter(user=request.user).exists() if request.user.is_authenticated else False
 
     # Инициализируем формы
     form = ReviewForm()
