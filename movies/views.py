@@ -6,7 +6,6 @@ from django.shortcuts import get_object_or_404
 from .models import Movie, Review, Comment
 from .serializers import MovieSerializer, ReviewSerializer, CommentSerializer
 
-
 class MovieListAPIView(APIView):
     """
     Возвращает список популярных и новых фильмов.

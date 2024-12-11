@@ -12,6 +12,7 @@ migrations/
 lib/
 bin/
 staticfiles/
+node_modules/
 
 # Игнорируем другие системные файлы
 *.log
@@ -26,4 +27,7 @@ staticfiles/
 # Игнорируем изображения
 *.jpg
 *.png
+
+# 
+*.json
 
