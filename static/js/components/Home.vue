@@ -52,11 +52,11 @@ export default {
       newMovies: [],
       query: '',
       user: null,
-      placeholder: '/static/images/placeholder.png', // Добавьте изображение-заглушку в static/images
+      placeholder: '/static/images/placeholder.png',
     };
   },
   mounted() {
-    fetch('/?format=api')
+    fetch('/api/movies')
       .then(res => res.json())
       .then(data => {
         this.popularMovies = data.popular_movies || [];
@@ -74,13 +74,13 @@ export default {
       fetch(`/api/movies/search?q=${this.query}`)
         .then(res => res.json())
         .then(data => {
-          // Допустим, вы хотите отобразить результаты поиска
           this.popularMovies = data.results || [];
         });
     },
   },
 };
 </script>
+
 
 <style>
 .navbar {
