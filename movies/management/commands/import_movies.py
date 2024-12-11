@@ -5,7 +5,7 @@ from movies.models import Movie, Genre, Actor, Director, Producer, Writer
 
 class Command(BaseCommand):
     help = 'Import movies from IMDb dataset'
-    path_data = '/home/musoroprovod/watcherrybd/work/'
+    path_data = '/home/musoroprovod/watcherry/data/'
     OMDB_API_KEY = '9639702f'  # Замените на ваш ключ OMDb
 
     def get_poster_url(self, title):

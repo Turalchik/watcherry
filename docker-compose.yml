@@ -1,0 +1,15 @@
+version: "3.9"  # Убедитесь, что используемая версия актуальна
+
+services:
+  web:
+    build:
+      context: .  # Указывает, что Dockerfile находится в текущей директории
+    ports:
+      - "8000:8000"  # Прокидываем порт контейнера на хост
+    volumes:
+      - .:/app  # Привязываем локальную директорию к директории в контейнере
+    environment:
+      DEBUG: "True"  # Устанавливаем переменные окружения
+    command: >
+      sh -c "python3 manage.py migrate &&
+             python3 manage.py runserver 0.0.0.0:8000"
