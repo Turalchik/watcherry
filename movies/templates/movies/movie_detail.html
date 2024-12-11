@@ -1,140 +1,14 @@
+<!-- movie_detail.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{{ movie.title }} - Детали фильма</title>
+    <title>{{ movie.title }}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-    <header>
-        <h1>{{ movie.title }}</h1>
-        
-        {% if movie.poster_url %}
-            <img src="{{ movie.poster_url }}" alt="Постер фильма {{ movie.title }}" style="max-width: 300px;">
-        {% else %}
-            <p>Постер не доступен.</p>
-        {% endif %}
-        
-        <p><strong>Жанр:</strong> {{ movie.genres.all|join:", " }}</p>
-        <p><strong>Год выпуска:</strong> {{ movie.release_year }}</p>
-        <p><strong>Рейтинг:</strong> {{ movie.rating }}</p>
-        <p><strong>Количество голосов:</strong> {{ movie.votes }}</p>
-        <p><strong>Продолжительность:</strong> {{ movie.duration }} минут</p>
-    </header>
+    <div id="app"></div>
 
-    <main>
-        <!-- Секция для актеров -->
-        <section>
-            <h2>Актеры</h2>
-            {% if movie.actors.all %}
-                <ul>
-                    {% for actor in movie.actors.all %}
-                        <li>{{ actor.name }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>Нет информации о актерах.</p>
-            {% endif %}
-        </section>
-
-        <!-- Секция для режиссеров -->
-        <section>
-            <h2>Режиссеры</h2>
-            {% if movie.directors.all %}
-                <ul>
-                    {% for director in movie.directors.all %}
-                        <li>{{ director.name }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>Нет информации о режиссерах.</p>
-            {% endif %}
-        </section>
-
-        <!-- Секция для продюсеров -->
-        <section>
-            <h2>Продюсеры</h2>
-            {% if movie.producers.all %}
-                <ul>
-                    {% for producer in movie.producers.all %}
-                        <li>{{ producer.name }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>Нет информации о продюсерах.</p>
-            {% endif %}
-        </section>
-
-        <section>
-            {% if user.is_authenticated %}
-                <form method="post" action="{% url 'toggle_like' movie.title_id %}">
-                    {% csrf_token %}
-                    {% if movie in user.profile.liked_movies.all %}
-                        <button type="submit" class="btn btn-danger">Удалить из понравившихся</button>
-                    {% else %}
-                        <button type="submit" class="btn btn-success">Добавить в понравившиеся</button>
-                    {% endif %}
-                </form>
-            {% endif %}
-        </section>
-
-        <!-- Секция для отзывов и комментариев -->
-        <section>
-            <h2>Отзывы</h2>
-            {% if reviews %}
-                <ul>
-                    {% for review in reviews %}
-                        <li>
-                            <p><strong>{{ review.user.username }}:</strong> {{ review.rating }} / 10</p>
-                            <p>{{ review.text }}</p>
-
-                            <!-- Комментарии к этому отзыву -->
-                            <div class="comments">
-                                {% for comment in review.comments.all %}
-                                    {% if not comment.parent %}
-                                        {% include 'movies/comment_tree.html' with comment=comment %}
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-
-                            <!-- Форма добавления комментария -->
-                            {% if user.is_authenticated %}
-                                <form method="post" style="margin-top: 10px;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="review_id" value="{{ review.id }}">
-                                    {{ comment_form.as_p }}
-                                    <button type="submit" name="comment">Добавить комментарий</button>
-                                </form>
-                            {% else %}
-                                <p>Чтобы оставить комментарий, необходимо <a href="{% url 'login' %}">войти</a>.</p>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>Нет отзывов для этого фильма.</p>
-            {% endif %}
-        </section>
-
-        <!-- Форма для оставления отзыва -->
-        <section>
-            {% if user.is_authenticated %}
-                {% if user_has_reviewed %}
-                    <p>Вы уже оставили отзыв для этого фильма.</p>
-                {% else %}
-                    <h3>Оставить отзыв:</h3>
-                    <form method="post">
-                        {% csrf_token %}
-                        {{ form.as_p }}
-                        <button type="submit" name="review">Отправить отзыв</button>
-                    </form>
-                {% endif %}
-            {% else %}
-                <p>Чтобы оставить отзыв, необходимо <a href="{% url 'login' %}">войти</a>.</p>
-            {% endif %}
-        </section>
-
-        <!-- Ссылка на главную страницу -->
-        <a href="{% url 'home' %}">На главную</a>
-    </main> 
+    <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>

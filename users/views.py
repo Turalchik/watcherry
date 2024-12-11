@@ -9,12 +9,12 @@ from movies.models import Movie
 from django.db.models import Q
 
 def register(request):
-    if request.method == 'POST':              
-        form = UserCreationForm(request.POST)  
-        if form.is_valid():                    
-            user = form.save()                 
-            login(request, user)               
-            messages.success(request, 'Регистрация прошла успешно!')  
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, 'Регистрация прошла успешно!')
             return redirect('profile')
     else:
         form = UserCreationForm()

@@ -1,16 +1,16 @@
 from django.contrib import admin
 from django.urls import path, include
-from movies.views import home
 from django.conf import settings
+from movies.views import MovieListAPIView
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', home, name='home'),  # Главная страница
+    path('', MovieListAPIView.as_view(), name='home'),
     path('admin/', admin.site.urls),
     path('', include('movies.urls')),
     path('search/', include('search.urls')),
     path('users/', include('users.urls')),
-    path('', include('django.contrib.auth.urls')),  # Встроенные маршруты для аутентификации
+    path('', include('django.contrib.auth.urls')),
 ]
 
 #k чтобы аватаарки сохранялись в медиа\аватарс

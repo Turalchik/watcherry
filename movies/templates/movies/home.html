@@ -1,55 +1,14 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
-    {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-    <div class="navbar">
-        <div class="navbar-left">
-            <a href="{% url 'home' %}" class="site-title">Watcherry</a>
-        </div>
-        <div class="navbar-center">
-            <form method="get" action="{% url 'search_movies' %}">
-                <input type="text" name="q" placeholder="Искать фильмы..." class="search-bar">
-                <button type="submit" class="search-button">🔍</button>
-            </form>
-        </div>
-        <div class="navbar-right">
-            {% if user.is_authenticated %}
-                <a href="{% url 'profile' %}" class="user-link">{{ user.username }}</a>
-            {% else %}
-                <a href="{% url 'login' %}" class="login-link">Вход</a>
-            {% endif %}
-        </div>
-    </div>
+    <div id="app"></div>
 
-    <h2>Популярные фильмы</h2>
-    <div class="movie-list">
-        {% for movie in popular_movies %}
-            <div class="movie-item">
-                <!-- Ссылка на страницу фильма по постеру -->
-                <a href="{% url 'movie_detail' title_id=movie.title_id %}">
-                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster">
-                </a>
-                <a href="{% url 'movie_detail' title_id=movie.title_id %}">{{ movie.title }}</a> - {{ movie.votes }} голосов
-            </div>
-        {% endfor %}
-    </div>
-
-    <h2>Новые фильмы</h2>
-    <div class="movie-list">
-        {% for movie in new_movies %}
-            <div class="movie-item">
-                <!-- Ссылка на страницу фильма по постеру -->
-                <a href="{% url 'movie_detail' title_id=movie.title_id %}">
-                    <img src="{{ movie.poster_url }}" alt="{{ movie.title }} poster">
-                </a>
-                <a href="{% url 'movie_detail' title_id=movie.title_id %}">{{ movie.title }}</a> - {{ movie.release_year }}
-            </div>
-        {% endfor %}
-    </div>
+    <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>

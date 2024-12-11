@@ -1,10 +1,18 @@
 from django.urls import path
-from . import views
+from .views import (
+    MovieListAPIView,
+    MovieDetailAPIView,
+    SearchMoviesAPIView,
+    ReviewListCreateAPIView,
+    CommentListCreateAPIView,
+    ToggleLikeAPIView,
+)
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('movie/<str:title_id>/', views.movie_detail, name='movie_detail'),
-    path('movie/<str:title_id>/toggle_like/', views.toggle_like, name='toggle_like'),  # Новый маршрут
-    path('movie/<str:title_id>/add_review/', views.add_review, name='add_review'),
-    path('search/', views.search_movies, name='search_movies'),
+    path('api/movies/', MovieListAPIView.as_view(), name='api-movie-list'),
+    path('api/movies/<str:title_id>/', MovieDetailAPIView.as_view(), name='api-movie-detail'),
+    path('api/movies/search/', SearchMoviesAPIView.as_view(), name='api-search-movies'),
+    path('api/movies/<str:title_id>/reviews/', ReviewListCreateAPIView.as_view(), name='api-review-list-create'),
+    path('api/reviews/<int:review_id>/comments/', CommentListCreateAPIView.as_view(), name='api-comment-list-create'),
+    path('api/movies/<str:title_id>/toggle_like/', ToggleLikeAPIView.as_view(), name='api-toggle-like'),
 ]
