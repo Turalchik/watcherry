@@ -10,7 +10,7 @@ services:
       - ./data:/app/data  # Монтируем папку data из хоста в контейнер
     environment:
       DEBUG: "True"  # Устанавливаем переменные окружения
-      DATA_DIR: "/app/data"
+
     command: >
       sh -c "python3 manage.py migrate &&
              python3 manage.py runserver 0.0.0.0:8000"
