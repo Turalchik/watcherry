@@ -1,16 +1,24 @@
-version: "3.9"  # Убедитесь, что используемая версия актуальна
+version: "3.9"
 
 services:
-  web:
+  backend:
     build:
-      context: .  # Указывает, что Dockerfile находится в текущей директории
+      context: .
     ports:
-      - "8000:8000"  # Прокидываем порт контейнера на хост
+      - "8000:8000"
     volumes:
-      - ./data:/app/data  # Монтируем папку data из хоста в контейнер
+      - ./data:/app/data
     environment:
-      DEBUG: "True"  # Устанавливаем переменные окружения
-
+      DEBUG: "True"
     command: >
       sh -c "python3 manage.py migrate &&
              python3 manage.py runserver 0.0.0.0:8000"
+
+  frontend:
+    build:
+      context: ./frontend/vue-project  # Путь до папки с Dockerfile для фронтенда
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/vue-project:/app  # Прокидываем исходный код
+    command: npm run dev
