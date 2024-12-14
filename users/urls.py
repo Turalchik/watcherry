@@ -1,16 +1,13 @@
-# users/urls.py
 from django.urls import path
-from django.contrib.auth import views as auth_views
-from django.contrib.auth.views import LogoutView
-from . import views
-from .views import change_password
-
+from .views import (
+    LoginView, RegisterAPIView, ProfileAPIView,
+    ChangePasswordAPIView, RecommendationsAPIView
+)
 
 urlpatterns = [
-    path('login/', auth_views.LoginView.as_view(), name='login'),
-    path('logout/', LogoutView.as_view(next_page='home'), name='logout'),  # Перенаправление на главную страницу
-    path('register/', views.register, name='register'),
-    path('profile/', views.profile, name='profile'),
-    path('change-password/', change_password, name='change_password'),
-
+    path('login/', LoginView.as_view(), name='api-login'),
+    path('register/', RegisterAPIView.as_view(), name='api-register'),
+    path('profile/', ProfileAPIView.as_view(), name='api-profile'),
+    path('change-password/', ChangePasswordAPIView.as_view(), name='api-change-password'),
+    path('recommendations/', RecommendationsAPIView.as_view(), name='api-recommendations'),
 ]

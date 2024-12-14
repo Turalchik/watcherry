@@ -31,8 +31,21 @@ class MovieDetailAPIView(APIView):
     """
     def get(self, request, title_id):
         movie = get_object_or_404(Movie, title_id=title_id)
-        serializer = MovieSerializer(movie)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        reviews = movie.reviews.prefetch_related('comments')
+        movie_serializer = MovieSerializer(movie)
+        review_serializer = ReviewSerializer(reviews, many=True)
+        
+        # Пример данных для аутентификации
+        is_authenticated = request.user.is_authenticated
+        user_has_reviewed = reviews.filter(user=request.user).exists() if is_authenticated else False
+        
+        data = {
+            'movie': movie_serializer.data,
+            'reviews': review_serializer.data,
+            'isAuthenticated': is_authenticated,
+            'userHasReviewed': user_has_reviewed,
+        }
+        return Response(data, status=200)
 
 
 class SearchMoviesAPIView(APIView):

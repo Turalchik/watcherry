@@ -10,6 +10,7 @@ class Genre(models.Model):
     def __str__(self):
         return self.name
 
+
 class Actor(models.Model):
     name_id = models.CharField(max_length=16, unique=True)
     name = models.CharField(max_length=255, null=True)
@@ -40,6 +41,7 @@ class Producer(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Movie(models.Model):
     title = models.CharField(max_length=255)
