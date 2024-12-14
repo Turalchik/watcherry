@@ -1,0 +1,59 @@
+<template>
+  <div>
+    <h1>Результаты поиска</h1>
+    <div v-if="query">
+      <p>Результаты для запроса: "{{ query }}"</p>
+      <div class="movie-list" v-if="movies.length">
+        <div class="movie-item" v-for="movie in movies" :key="movie.title_id">
+          <a :href="`/movie/${movie.title_id}`">
+            <img :src="movie.poster_url" :alt="`${movie.title} poster`" />
+          </a>
+          <a :href="`/movie/${movie.title_id}`">{{ movie.title }}</a>
+        </div>
+      </div>
+      <p v-else>Фильмы не найдены.</p>
+    </div>
+    <p v-else>Введите запрос для поиска.</p>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "SearchResults",
+  props: {
+    query: {
+      type: String,
+      required: false,
+    },
+    movies: {
+      type: Array,
+      required: true,
+    },
+  },
+};
+</script>
+
+<style scoped>
+.movie-list {
+  display: flex;
+  flex-wrap: wrap; /* Перенос элементов на новую строку, если они не помещаются */
+  gap: 20px; /* Промежуток между элементами */
+}
+
+.movie-item {
+  text-align: center;
+  width: 150px; /* Ограничение ширины каждого элемента */
+}
+
+.movie-item img {
+  width: 100px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.movie-item a {
+  display: block;
+  margin-top: 5px;
+}
+</style>
