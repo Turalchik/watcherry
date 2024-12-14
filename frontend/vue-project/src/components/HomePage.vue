@@ -1,5 +1,9 @@
+<!-- frontend/src/components/HomePage.vue -->
 <template>
   <div>
+    <!-- Добавляем компонент Navbar -->
+    <Navbar />
+
     <h1>Популярные фильмы</h1>
     <div v-if="isLoading">Загрузка...</div>
     <div v-else-if="error">
@@ -7,9 +11,9 @@
     </div>
     <ul v-else class="movie-list">
       <li v-for="movie in popularMovies" :key="movie.id" class="movie-item">
-        <router-link :to="`/movie/${movie.id}`">
+        <router-link :to="`/movie/${movie.title_id}`">
           <img :src="movie.poster_url" :alt="movie.title" class="movie-poster" />
-          <span>{{ movie.title }} ({{ movie.year }})</span>
+          <span>{{ movie.title }} ({{ movie.release_year }})</span>
         </router-link>
       </li>
     </ul>
@@ -21,9 +25,9 @@
     </div>
     <ul v-else class="movie-list">
       <li v-for="movie in newMovies" :key="movie.id" class="movie-item">
-        <router-link :to="`/movie/${movie.id}`">
+        <router-link :to="`/movie/${movie.title_id}`">
           <img :src="movie.poster_url" :alt="movie.title" class="movie-poster" />
-          <span>{{ movie.title }} ({{ movie.year }})</span>
+          <span>{{ movie.title }} ({{ movie.release_year }})</span>
         </router-link>
       </li>
     </ul>
@@ -31,9 +35,14 @@
 </template>
 
 <script>
+// Импортируем компонент Navbar
+import Navbar from './Navbar.vue';
 import { fetchPopularAndNewMovies } from '../api';
 
 export default {
+  components: {
+    Navbar, // Добавляем компонент Navbar в список компонентов
+  },
   data() {
     return {
       popularMovies: [],

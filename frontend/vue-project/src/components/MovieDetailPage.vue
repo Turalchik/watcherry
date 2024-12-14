@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="movie">
     <header>
       <h1>{{ movie.title }}</h1>
       
@@ -95,6 +95,9 @@
       <!-- Ссылка на главную -->
       <router-link to="/">На главную</router-link>
     </main>
+  </div>
+  <div v-else>
+    <p>Загрузка...</p>
   </div>
 </template>
 

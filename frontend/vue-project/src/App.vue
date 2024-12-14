@@ -1,14 +1,5 @@
 <template>
   <div id="app">
-    <header>
-      <nav>
-        <ul>
-          <li><router-link to="/">Главная</router-link></li>
-          <li><router-link to="/search">Поиск</router-link></li>
-          <li><router-link to="/profile">Профиль</router-link></li>
-        </ul>
-      </nav>
-    </header>
     <main>
       <router-view />
     </main>
