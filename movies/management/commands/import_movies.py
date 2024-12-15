@@ -8,7 +8,7 @@ class Command(BaseCommand):
     help = 'Import movies from IMDb dataset'
     #path_data = ''
     OMDB_API_KEY = '9639702f'  # Замените на ваш ключ OMDb
-    DATA_DIR = os.getenv("DATA_DIR", "/app/data/")  # Путь к папке с данными
+    DATA_DIR = os.getenv("DATA_DIR", "C:/Users/79874/Desktop/Университет/Учёба/Watcherry/watcherry/data/")  # Путь к папке с данными
 
 
     def get_poster_url(self, title):

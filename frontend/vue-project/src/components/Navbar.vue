@@ -4,6 +4,14 @@
     <div class="navbar-left">
       <!-- Кнопка для перехода на главную страницу -->
       <router-link to="/" class="navbar-button">Главная</router-link>
+      <!-- Поле для ввода поискового запроса -->
+      <input
+        v-model="searchQuery"
+        @keydown.enter="performSearch"
+        class="navbar-input"
+        type="text"
+        placeholder="Введите запрос для поиска"
+      />
     </div>
     <div class="navbar-right">
       <!-- Кнопка для перехода в личный кабинет или кнопка "Вход" -->
@@ -23,6 +31,7 @@ export default {
     return {
       isLoggedIn: false,  // Статус авторизации
       userName: '',       // Никнейм пользователя
+      searchQuery: '',    // Хранение текста поискового запроса
     };
   },
   methods: {
@@ -44,7 +53,10 @@ export default {
     },
     goToProfile() {
       this.$router.push('/profile'); // Переход на страницу профиля
-    }
+    },
+    performSearch() {
+      this.$router.push({ path: '/search', query: { q: this.searchQuery } }); // Обработка поискового запроса
+    },
   },
   mounted() {
     this.getUserProfile(); // Получаем данные пользователя при загрузке компонента
@@ -67,6 +79,15 @@ export default {
   border: none;
   padding: 10px;
   cursor: pointer;
+  margin-right: 15px;
+}
+
+.navbar-input {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 300px;
 }
 
 .navbar-button:hover {
