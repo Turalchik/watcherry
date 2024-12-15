@@ -10,46 +10,57 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      # 1. Проверка кода из репозитория
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. Установка Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
 
-      # 3. Установка зависимостей Django
       - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
 
-      # 4. Установка Node.js (для сборки статических файлов)
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      # 5. Установка зависимостей фронтенда
       - name: Install frontend dependencies
         working-directory: frontend/vue-project
         run: npm install
 
-      # 6. Сборка статических файлов
       - name: Build static files
         working-directory: frontend/vue-project
         run: npm run build
 
-      # 7. Копирование собранных файлов в Django static/
       - name: Move static files to Django static
         run: cp -r frontend/vue-project/dist/* static/js/
-    
 
-      # 8. Сборка статических файлов Django
       - name: Collect Django static files
         run: python manage.py collectstatic --noinput
 
-      # 9. Запуск тестов
+      - name: Apply migrations
+        run: python manage.py migrate
+
       - name: Run tests
         run: python manage.py test movies.tests
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: docker build -t watcherry-app .
+
+      - name: Validate Docker Compose
+        run: docker-compose -f docker-compose.yml config
+
+      - name: Start services
+        run: docker-compose up -d
+
+      - name: Run health check
+        run: curl -f http://localhost:8000 || exit 1
+
+      - name: Stop services
+        run: docker-compose down
