@@ -1,6 +1,7 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 from .serializers import (
@@ -24,6 +25,19 @@ class RegisterAPIView(generics.CreateAPIView):
     def perform_create(self, serializer):
         user = serializer.save()
         Profile.objects.get_or_create(user=user)
+
+    def create(self, request, *args, **kwargs):
+        """
+        Переопределенный метод create для возврата токена после регистрации
+        """
+        response = super().create(request, *args, **kwargs)  # Создаем пользователя
+        user = User.objects.get(username=request.data['username'])  # Получаем пользователя по имени
+        refresh = RefreshToken.for_user(user)  # Создаем токен для пользователя
+        access_token = str(refresh.access_token)  # Доступ к токену
+        return Response({
+            'token': access_token,  # Возвращаем токен
+            'username': user.username  # Возвращаем имя пользователя
+        }, status=status.HTTP_201_CREATED)
 
 
 class ProfileAPIView(generics.RetrieveUpdateAPIView):
