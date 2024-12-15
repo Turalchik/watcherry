@@ -1,13 +1,10 @@
-# Исключаем файлы Python байт-кода
 *.pyc
 *.pyo
 __pycache__/
 
-# Исключаем файлы данных
 *.tsv
 *.sqlite3
 
-# Исключаем папки миграций, lib, bin и staticfiles
 migrations/
 lib/
 bin/
@@ -15,16 +12,13 @@ staticfiles/
 node_modules/
 data/
 
-# Игнорируем другие системные файлы
 *.log
 *.pot
 *.pyc
 *.pyo
 
-# Игнорируем файлы с настройками IDE
 .idea/
 .vscode/
 
-# Игнорируем изображения
 *.jpg
 *.png

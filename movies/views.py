@@ -12,9 +12,6 @@ def home_view(request):
 
 
 class MovieListAPIView(APIView):
-    """
-    Возвращает список популярных и новых фильмов.
-    """
     def get(self, request):
         popular_movies = Movie.objects.order_by('-votes')[:10]
         new_movies = Movie.objects.order_by('-release_year')[:10]
@@ -26,9 +23,6 @@ class MovieListAPIView(APIView):
 
 
 class MovieDetailAPIView(APIView):
-    """
-    Возвращает детальную информацию о фильме.
-    """
     def get(self, request, title_id):
         movie = get_object_or_404(Movie, title_id=title_id)
         reviews = movie.reviews.prefetch_related('comments')
@@ -49,9 +43,6 @@ class MovieDetailAPIView(APIView):
 
 
 class SearchMoviesAPIView(APIView):
-    """
-    Обрабатывает поиск фильмов по заголовку.
-    """
     def get(self, request):
         query = request.GET.get('q', '')
         if query:
@@ -62,9 +53,6 @@ class SearchMoviesAPIView(APIView):
 
 
 class ReviewListCreateAPIView(APIView):
-    """
-    Список отзывов для фильма или создание нового отзыва.
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, title_id):
@@ -83,9 +71,6 @@ class ReviewListCreateAPIView(APIView):
 
 
 class CommentListCreateAPIView(APIView):
-    """
-    Список комментариев для отзыва или добавление нового комментария.
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, review_id):
@@ -104,9 +89,6 @@ class CommentListCreateAPIView(APIView):
 
 
 class ToggleLikeAPIView(APIView):
-    """
-    Лайк/дизлайк фильма.
-    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, title_id):

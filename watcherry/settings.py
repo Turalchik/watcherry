@@ -127,20 +127,19 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
-    BASE_DIR / "static"  # Указываем путь к папке static
+    BASE_DIR / "static" 
 ]
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = 'profile'
-LOGOUT_REDIRECT_URL = '/'  # Перенаправление на главную страницу после выхода
+LOGOUT_REDIRECT_URL = '/' 
 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-#k: это для того, чтобы аватарки сохранялись в медиа
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'  # Путь к папке для хранения медиа-файлов
+MEDIA_ROOT = BASE_DIR / 'media'  
 
 
 CORS_ALLOW_ALL_ORIGINS = True
