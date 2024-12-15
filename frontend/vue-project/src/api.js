@@ -50,9 +50,10 @@ export const toggleLike = async (titleId, token) => {
 export const loginUser = async (credentials) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/login/`, credentials);
-        return response.data; // Возвращает данные пользователя или токен
+        return response.data;
     } catch (error) {
-        console.error("Ошибка входа:", error.response?.data || error.message);
+        const errorMessage = error.response?.data?.detail || error.message;
+        alert(`Ошибка: ${errorMessage}`);
         throw error;
     }
 };
@@ -60,10 +61,11 @@ export const loginUser = async (credentials) => {
 // Регистрация пользователя
 export const registerUser = async (userData) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/register/`, userData);
+        const response = await axios.post(`${API_BASE_URL}/register/`, credentials);
         return response.data;
     } catch (error) {
-        console.error("Ошибка регистрации:", error.response?.data || error.message);
+        const errorMessage = error.response?.data?.detail || error.message;
+        alert(`Ошибка: ${errorMessage}`);
         throw error;
     }
 };
@@ -76,7 +78,8 @@ export const fetchUserProfile = async (token) => {
         });
         return response.data;
     } catch (error) {
-        console.error("Ошибка получения профиля:", error.response?.data || error.message);
+        const errorMessage = error.response?.data?.detail || error.message;
+        alert(`Ошибка: ${errorMessage}`);
         throw error;
     }
 };
@@ -89,7 +92,8 @@ export const updateUserProfile = async (profileData, token) => {
         });
         return response.data;
     } catch (error) {
-        console.error("Ошибка обновления профиля:", error.response?.data || error.message);
+        const errorMessage = error.response?.data?.detail || error.message;
+        alert(`Ошибка: ${errorMessage}`);
         throw error;
     }
 };
@@ -102,7 +106,8 @@ export const changePassword = async (passwordData, token) => {
         });
         return response.data;
     } catch (error) {
-        console.error("Ошибка смены пароля:", error.response?.data || error.message);
+        const errorMessage = error.response?.data?.detail || error.message;
+        alert(`Ошибка: ${errorMessage}`);
         throw error;
     }
 };
@@ -115,7 +120,8 @@ export const fetchRecommendations = async (token) => {
         });
         return response.data;
     } catch (error) {
-        console.error("Ошибка получения рекомендаций:", error.response?.data || error.message);
+        const errorMessage = error.response?.data?.detail || error.message;
+        alert(`Ошибка: ${errorMessage}`);
         throw error;
     }
 };
