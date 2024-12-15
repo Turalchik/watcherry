@@ -27,16 +27,19 @@ export default {
   },
   methods: {
     async getUserProfile() {
+      const token = localStorage.getItem('token'); // Получаем токен
+      if (!token || token == 'undefined') {
+          console.warn('Токен отсутствует. Пользователь не авторизован.');
+          this.isLoggedIn = false; // Убедитесь, что статус корректно обновляется
+          return;
+      }
       try {
-        const token = localStorage.getItem('token'); // Получаем токен из localStorage
-        if (token) {
-          const profile = await fetchUserProfile(token); // Получаем профиль пользователя
+          const profile = await fetchUserProfile(token);
           this.isLoggedIn = true;
-          this.userName = profile.username; // Устанавливаем никнейм пользователя
-        }
+          this.userName = profile.username;
       } catch (error) {
-        console.error('Ошибка получения профиля:', error);
-        this.isLoggedIn = false;
+          console.error('Ошибка получения профиля:', error);
+          this.isLoggedIn = false;
       }
     },
     goToProfile() {

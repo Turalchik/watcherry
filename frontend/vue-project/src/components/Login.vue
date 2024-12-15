@@ -7,6 +7,10 @@
             <button type="submit">Войти</button>
         </form>
         <p v-if="errorMessage">{{ errorMessage }}</p>
+        <p class="register-link">
+            Нет аккаунта? 
+            <router-link to="/register">Зарегистрироваться</router-link>
+        </p>
     </div>
 </template>
 
@@ -29,8 +33,8 @@ export default {
                     password: this.password
                 };
                 const response = await loginUser(credentials);
-                localStorage.setItem('token', response.token); // Сохраняем токен
-                this.$router.push('/'); // Переходим на главную страницу
+                localStorage.setItem('token', response.token); // Save token
+                this.$router.push('/'); // Redirect to home page
             } catch (error) {
                 this.errorMessage = 'Неверный логин или пароль';
             }
@@ -38,3 +42,10 @@ export default {
     }
 };
 </script>
+
+<style>
+.register-link {
+    margin-top: 10px;
+    font-size: 14px;
+}
+</style>

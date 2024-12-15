@@ -61,7 +61,7 @@ export const loginUser = async (credentials) => {
 // Регистрация пользователя
 export const registerUser = async (userData) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/register/`, credentials);
+        const response = await axios.post(`${API_BASE_URL}/register/`, userData);
         return response.data;
     } catch (error) {
         const errorMessage = error.response?.data?.detail || error.message;
@@ -72,6 +72,10 @@ export const registerUser = async (userData) => {
 
 // Получение профиля пользователя
 export const fetchUserProfile = async (token) => {
+    if (!token) {
+        alert("Токен не найден");
+        return;
+    }
     try {
         const response = await axios.get(`${API_BASE_URL}/profile/`, {
             headers: { Authorization: `Bearer ${token}` },
@@ -87,7 +91,7 @@ export const fetchUserProfile = async (token) => {
 // Обновление профиля пользователя
 export const updateUserProfile = async (profileData, token) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/profile/`, profileData, {
+        const response = await axios.put(`${API_BASE_URL}/profile/`, profileData, {
             headers: { Authorization: `Bearer ${token}` },
         });
         return response.data;
