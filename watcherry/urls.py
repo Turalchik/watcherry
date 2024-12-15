@@ -4,12 +4,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from movies.views import home_view  # Импортируем представление для главной страницы
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view, name='home'),  # Указываем путь к главной странице
     path('', include('movies.urls')),
     path('search/', include('search.urls')),
-    path('users/', include('users.urls')),
+    path('', include('users.urls')),
     path('', include('django.contrib.auth.urls')),
 ]
 

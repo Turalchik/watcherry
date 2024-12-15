@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '../components/HomePage.vue';
 import SearchPage from '../components/SearchResults.vue';
 import ProfilePage from '../components/Profile.vue';
+import Login from '../components/Login.vue';
 import MovieDetail from '../components/MovieDetailPage.vue';
 
 const routes = [
@@ -9,6 +10,8 @@ const routes = [
   { path: '/search', component: SearchPage },
   { path: '/profile', component: ProfilePage },
   { path: '/movie/:id', component: MovieDetail, props: true },
+  { path: '/login', component: Login },
+  { path: '/profile', component: ProfilePage },
 ];
 
 const router = createRouter({

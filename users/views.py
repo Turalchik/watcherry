@@ -1,9 +1,8 @@
 from rest_framework import generics, status
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, update_session_auth_hash
 from .serializers import (
     UserSerializer, ProfileSerializer, PasswordChangeSerializer,
     MovieSerializer, RecommendationSerializer
@@ -11,49 +10,34 @@ from .serializers import (
 from .models import Profile
 from movies.models import Movie
 from django.db.models import Q
-from rest_framework_simplejwt.tokens import RefreshToken
 
-# Вход пользователя
-class LoginView(APIView):
+
+class LoginView(TokenObtainPairView):
     permission_classes = [AllowAny]
 
-    def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        user = authenticate(username=username, password=password)
-        if user:
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-                'username': user.username
-            })
-        return Response({"detail": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
-# Регистрация пользователя
-class RegisterAPIView(APIView):
+class RegisterAPIView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            login(request, user)
-            return Response({"message": "Регистрация прошла успешно!"}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        user = serializer.save()
+        Profile.objects.get_or_create(user=user)
 
-# Профиль пользователя
-class ProfileAPIView(APIView):
+
+class ProfileAPIView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = ProfileSerializer
 
-    def get(self, request):
+    def get_object(self):
+        profile, created = Profile.objects.get_or_create(user=self.request.user)
+        return profile
+
+    def get(self, request, *args, **kwargs):
+        profile_serializer = self.get_serializer(self.get_object())
         user = request.user
 
-        # Создание профиля, если он отсутствует
-        if not hasattr(user, 'profile'):
-            Profile.objects.create(user=user)
-
-        profile_serializer = ProfileSerializer(user.profile)
         reviews = user.reviews.all()
         reviews_serializer = RecommendationSerializer(reviews, many=True)
 
@@ -74,43 +58,31 @@ class ProfileAPIView(APIView):
             "recommendations": recommendations_serializer.data,
         })
 
-    def post(self, request):
-        profile_serializer = ProfileSerializer(request.user.profile, data=request.data, partial=True)
-        if profile_serializer.is_valid():
-            profile_serializer.save()
-            return Response(profile_serializer.data, status=status.HTTP_200_OK)
-        return Response(profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Смена пароля
-class ChangePasswordAPIView(APIView):
+class ChangePasswordAPIView(generics.UpdateAPIView):
+    serializer_class = PasswordChangeSerializer
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        serializer = PasswordChangeSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            user = serializer.save()
-            update_session_auth_hash(request, user)
-            return Response({"message": "Пароль успешно изменен!"}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_object(self):
+        return self.request.user
 
-# Рекомендации
-class RecommendationsAPIView(APIView):
+
+class RecommendationsAPIView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = MovieSerializer
 
-    def get(self, request):
-        recommendations = get_recommendations(request.user)
-        serializer = MovieSerializer(recommendations, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        return get_recommendations(self.request.user)
 
-# Вспомогательная функция для рекомендаций
+
 def get_recommendations(user):
     liked_movies = user.profile.liked_movies.prefetch_related('genres', 'actors').all()
     if not liked_movies:
         return []
 
-    liked_genres = set(genre for movie in liked_movies for genre in movie.genres.all())
-    liked_actors = set(actor for movie in liked_movies for actor in movie.actors.all())
-    liked_producers = set(producer for movie in liked_movies for producer in movie.producers.all())
+    liked_genres = {genre for movie in liked_movies for genre in movie.genres.all()}
+    liked_actors = {actor for movie in liked_movies for actor in movie.actors.all()}
+    liked_producers = {producer for movie in liked_movies for producer in movie.producers.all()}
 
     filter_criteria = Q()
     if liked_genres:
