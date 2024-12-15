@@ -53,6 +53,11 @@ jobs:
       - name: Build Docker image
         run: docker build -t watcherry-app .
 
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose  
+
       - name: Validate Docker Compose
         run: docker-compose -f docker-compose.yml config
 
