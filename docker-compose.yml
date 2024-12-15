@@ -4,14 +4,19 @@ services:
   backend:
     build:
       context: .
+    network_mode: "bridge"
     ports:
       - "8000:8000"
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data  # Монтируем папку с данными
     environment:
       DEBUG: "True"
+      DATA_DIR: "/app/data"
     command: >
-      sh -c "python3 manage.py migrate &&
+      sh -c "python3 manage.py makemigrations movies &&
+             python3 manage.py makemigrations users &&
+             python3 manage.py migrate &&
+             python3 manage.py import_movies &&
              python3 manage.py runserver 0.0.0.0:8000"
 
   frontend:
