@@ -33,7 +33,7 @@ jobs:
 
       # 5. Установка зависимостей фронтенда
       - name: Install frontend dependencies
-        working-directory: frontend
+        working-directory: frontend/vue-project
         run: npm install
 
       # 6. Сборка статических файлов
@@ -43,7 +43,7 @@ jobs:
 
       # 7. Копирование собранных файлов в Django static/
       - name: Move static files to Django static
-        run: cp -r frontend/vue-project/dist/* watcherry/static/js/
+        run: cp -r frontend/vue-project/dist/* static/js/
     
 
       # 8. Сборка статических файлов Django
