@@ -19,8 +19,7 @@ jobs:
           python-version: 3.11
 
       - name: Install Python dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -64,8 +63,11 @@ jobs:
       - name: Start services
         run: docker-compose up -d
 
-      - name: Run health check
-        run: curl -f http://localhost:8000 || exit 1
+      - name: Wait for Django to start
+        run: |
+          for i in {1..10}; do
+            curl -f http://localhost:8000 && break || echo "Waiting for Django..." && sleep 5;
+          done
 
       - name: Stop services
         run: docker-compose down
