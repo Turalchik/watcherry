@@ -1,4 +1,4 @@
-name: CI 
+name: CI
 
 on:
   push:
@@ -12,17 +12,62 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install frontend dependencies
+        working-directory: frontend/vue-project
+        run: npm install
+
+      - name: Build static files
+        working-directory: frontend/vue-project
+        run: npm run build
+
+      - name: Move static files to Django static
+        run: cp -r frontend/vue-project/dist/* static/js/
+
+      - name: Collect Django static files
+        run: python manage.py collectstatic --noinput
+
+      - name: Apply migrations
+        run: python manage.py migrate
 
       - name: Run tests
+        run: python manage.py test movies.tests
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: docker build -t watcherry-app .
+
+      - name: Install Docker Compose
         run: |
-          python manage.py test movies.tests
-  
+          sudo apt-get update
+          sudo apt-get install -y docker-compose  
+
+      - name: Validate Docker Compose
+        run: docker-compose -f docker-compose.yml config
+
+      - name: Start services
+        run: docker-compose up -d
+
+      - name: Wait for Django to start
+        run: |
+          for i in {1..10}; do
+            curl -f http://localhost:8000 && break || echo "Waiting for Django..." && sleep 5;
+          done
+
+      - name: Stop services
+        run: docker-compose down
