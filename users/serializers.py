@@ -41,7 +41,7 @@ class PasswordChangeSerializer(serializers.Serializer):
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ['id', 'title', 'description', 'genres', 'actors', 'rating']
+        fields = ['id', 'title', 'genres', 'actors', 'rating']
 
 
 class RecommendationSerializer(serializers.ModelSerializer):
