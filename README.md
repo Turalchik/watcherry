@@ -1,7 +1,7 @@
 # WATCHERRY
 
 ## ER-диаграмма Watcherry Database
-![watcherry](https://github.com/user-attachments/assets/f44aed1a-394c-4da1-ab41-3a77a1b3dc70)
+![watcherry](https://github.com/user-attachments/assets/791012d3-b837-448d-a15a-d812e3731b0a)
 
 ## Описание проекта
 Проект создан в рамках дисциплин “Технологии Интернет и WEB-программирования” и “Введение в системы баз данных” студентами Девришевым Туралом, Ладнюк Кирой и Гареевым Эльдаром.
