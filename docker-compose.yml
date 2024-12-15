@@ -16,9 +16,10 @@ services:
 
   frontend:
     build:
-      context: ./frontend/vue-project  # Путь до папки с Dockerfile для фронтенда
+      context: ./frontend/vue-project
     ports:
       - "5173:5173"
     volumes:
-      - ./frontend/vue-project:/app  # Прокидываем исходный код
+      - ./frontend/vue-project:/app
+      - /app/node_modules  # Исключаем node_modules
     command: npm run dev
