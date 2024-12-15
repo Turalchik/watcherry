@@ -1,3 +1,4 @@
+import os  # Добавлено
 import csv
 import requests
 from django.core.management.base import BaseCommand
@@ -5,9 +6,10 @@ from movies.models import Movie, Genre, Actor, Director, Producer, Writer
 
 class Command(BaseCommand):
     help = 'Import movies from IMDb dataset'
-    path_data = '/home/turalchik/web/project/watcherry/'
+    #path_data = ''
     OMDB_API_KEY = '9639702f'  # Замените на ваш ключ OMDb
     DATA_DIR = os.getenv("DATA_DIR", "/app/data/")  # Путь к папке с данными
+
 
     def get_poster_url(self, title):
         url = f'http://www.omdbapi.com/?t={title}&apikey={self.OMDB_API_KEY}'
@@ -84,7 +86,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         
-        movie_to_actors, movie_to_producers = self.movieToActorsAndProducers(filename='title.principals.tsv')
+        movie_to_actors, movie_to_producers = self.movieToActorsAndProducers(filename='title_principals_sample.tsv')
         movie_to_rating = self.movieToRating(filename='title.ratings.tsv')
         id_to_name = self.idToName(filename='name.basics.tsv')
         movie_to_directors, movie_to_writers = self.movieToDirectorsAndWriters(filename='title_crew_sample.tsv')
