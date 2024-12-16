@@ -2,6 +2,9 @@
   <div class="profile-container">
     <h2>Личный кабинет</h2>
     
+    <!-- Кнопка "Выйти" -->
+    <button class="logout-button" @click="logout">Выйти</button>
+    
     <!-- Личная информация -->
     <div class="profile-info">
       <img :src="userProfile.avatar_url" alt="Аватар" class="avatar" />
@@ -73,6 +76,13 @@ export default {
       console.error('Ошибка получения профиля:', error);
     }
   },
+  methods: {
+    logout() {
+      localStorage.removeItem('token'); // Удаляем токен
+      authState.setAuth(false); // Обновляем глобальное состояние авторизации
+      this.$router.push('/login'); // Перенаправляем на страницу входа
+    },
+  },
 };
 </script>
 
@@ -88,5 +98,18 @@ export default {
 }
 .movies-section {
   margin-top: 20px;
+}
+.logout-button {
+  background-color: #ff4d4f;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+.logout-button:hover {
+  background-color: #ff7875;
 }
 </style>

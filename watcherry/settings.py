@@ -156,6 +156,6 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),  # Токен доступа действует 1 час
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=10),  # Токен доступа действует 1 час
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # Токен обновления действует 7 дней
 }

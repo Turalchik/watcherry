@@ -16,6 +16,7 @@
 
 <script>
 import { loginUser } from '../api';
+import { authState } from '../auth'; // Импорт глобального состояния
 
 export default {
     data() {
@@ -38,7 +39,7 @@ export default {
 
                 // Сохраняем токен в localStorage
                 localStorage.setItem('token', response.token); // Теперь response.token должен содержать токен
-
+                authState.setAuth(true);
                 // Перенаправляем на главную страницу
                 this.$router.push('/');
             } catch (error) {

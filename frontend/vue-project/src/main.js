@@ -1,5 +1,9 @@
-import { createApp } from 'vue';
+import { createApp, provide } from 'vue';
+import { authState } from './auth';
 import App from './App.vue';
 import router from './router';
 
-createApp(App).use(router).mount('#app');
+const app = createApp(App);
+app.provide('authState', authState); // Предоставляем глобальное состояние
+app.use(router);
+app.mount('#app');

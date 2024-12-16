@@ -102,17 +102,21 @@
 </template>
 
 <script>
+import { inject } from 'vue';
 import CommentTree from './CommentTree.vue';
 import { fetchMovieDetails } from '../api';
+import { authState } from '../auth';
 
 export default {
   components: { CommentTree },
+  setup() {
+    const authState = inject('authState');
+    return { authState };
+  },
   data() {
     return {
       movie: null,
       reviews: [],
-      isAuthenticated: false, // Проверка авторизации пользователя
-      userHasReviewed: false, // Проверка, оставлял ли пользователь отзыв
       newReview: { text: '', rating: null },
       newComment: {}, // Поле для хранения новых комментариев к отзывам
     };
@@ -123,19 +127,21 @@ export default {
       const data = await fetchMovieDetails(movieId);
       this.movie = data.movie;
       this.reviews = data.reviews;
-      this.isAuthenticated = data.isAuthenticated; // Используем данные из API
-      this.userHasReviewed = data.userHasReviewed; // Используем данные из API
+      this.authState.setAuth(data.isAuthenticated); // Устанавливаем глобальное состояние
     } catch (error) {
       console.error('Ошибка при загрузке данных:', error);
     }
   },
+  computed: {
+    isAuthenticated() {
+      return this.authState.isAuthenticated;
+    },
+  },
   methods: {
     async addReview() {
-      // Реализация добавления отзыва
       console.log('Submitting review:', this.newReview);
     },
     async addComment(reviewId) {
-      // Реализация добавления комментария
       console.log('Adding comment for review:', reviewId, this.newComment[reviewId]);
     },
   },
