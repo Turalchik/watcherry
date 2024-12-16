@@ -11,10 +11,26 @@ from .serializers import (
 from .models import Profile
 from movies.models import Movie
 from django.db.models import Q
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
 class LoginView(TokenObtainPairView):
     permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        """
+        Расширяем поведение стандартного TokenObtainPairView,
+        чтобы вернуть токен в виде `response.token`.
+        """
+        response = super().post(request, *args, **kwargs)
+        
+        # Проверяем, что токен получен успешно
+        if response.status_code == status.HTTP_200_OK:
+            return Response({
+                'token': response.data['access'],  # Возвращаем только access_token
+            }, status=status.HTTP_200_OK)
+        
+        return response
 
 
 class RegisterAPIView(generics.CreateAPIView):
@@ -23,51 +39,56 @@ class RegisterAPIView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
+        """
+        Создаем пользователя и его профиль.
+        """
         user = serializer.save()
         Profile.objects.get_or_create(user=user)
 
     def create(self, request, *args, **kwargs):
         """
-        Переопределенный метод create для возврата токена после регистрации
+        Возвращаем только подтверждение регистрации без токена.
         """
-        response = super().create(request, *args, **kwargs)  # Создаем пользователя
-        user = User.objects.get(username=request.data['username'])  # Получаем пользователя по имени
-        refresh = RefreshToken.for_user(user)  # Создаем токен для пользователя
-        access_token = str(refresh.access_token)  # Доступ к токену
+        response = super().create(request, *args, **kwargs)
         return Response({
-            'token': access_token,  # Возвращаем токен
-            'username': user.username  # Возвращаем имя пользователя
+            'message': 'Регистрация прошла успешно!',
+            'username': request.data['username']
         }, status=status.HTTP_201_CREATED)
 
 
-class ProfileAPIView(generics.RetrieveUpdateAPIView):
+class ProfileAPIView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ProfileSerializer
+    authentication_classes = [JWTAuthentication]
 
     def get_object(self):
+        # Возвращаем профиль текущего пользователя
         profile, created = Profile.objects.get_or_create(user=self.request.user)
         return profile
 
     def get(self, request, *args, **kwargs):
-        profile_serializer = self.get_serializer(self.get_object())
+        profile = self.get_object()
         user = request.user
 
-        reviews = user.reviews.all()
-        reviews_serializer = RecommendationSerializer(reviews, many=True)
+        # Получаем сериализаторы
+        profile_serializer = self.get_serializer(profile)
 
+        # Отзывы и фильмы с отзывами
         movies_with_reviews = Movie.objects.filter(reviews__user=user).distinct()
-        movies_serializer = MovieSerializer(movies_with_reviews, many=True)
+        movies_with_reviews_serializer = MovieSerializer(movies_with_reviews, many=True)
 
-        liked_movies = user.profile.liked_movies.all()
+        # Понравившиеся фильмы
+        liked_movies = profile.liked_movies.all()
         liked_movies_serializer = MovieSerializer(liked_movies, many=True)
 
+        # Рекомендации
         recommendations = get_recommendations(user)
         recommendations_serializer = MovieSerializer(recommendations, many=True)
 
+        # Возвращаем данные
         return Response({
             "profile": profile_serializer.data,
-            "reviews": reviews_serializer.data,
-            "movies_with_reviews": movies_serializer.data,
+            "movies_with_reviews": movies_with_reviews_serializer.data,
             "liked_movies": liked_movies_serializer.data,
             "recommendations": recommendations_serializer.data,
         })
