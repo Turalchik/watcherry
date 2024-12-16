@@ -44,10 +44,10 @@ class PasswordChangeSerializer(serializers.Serializer):
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ['id', 'title', 'genres', 'actors', 'rating']
+        fields = ['title_id', 'title', 'genres', 'actors', 'rating']
 
 
 class RecommendationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['id', 'movie', 'content', 'rating']
+        fields = ['title_id', 'movie', 'content', 'rating']

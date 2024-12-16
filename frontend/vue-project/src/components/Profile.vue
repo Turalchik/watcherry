@@ -16,7 +16,7 @@
       <h3>Фильмы, которые вы комментировали:</h3>
       <ul>
         <li v-for="movie in moviesWithReviews" :key="movie.id">
-          <a :href="`/movies/${movie.id}`">{{ movie.title }}</a>
+          <a :href="`/movie/${movie.title_id}`">{{ movie.title }}</a>
         </li>
       </ul>
     </div>
@@ -26,7 +26,7 @@
       <h3>Понравившиеся фильмы:</h3>
       <ul>
         <li v-for="movie in likedMovies" :key="movie.id">
-          <a :href="`/movies/${movie.id}`">{{ movie.title }}</a>
+          <a :href="`/movie/${movie.title_id}`">{{ movie.title }}</a>
         </li>
       </ul>
     </div>
@@ -36,7 +36,7 @@
       <h3>Рекомендации для вас:</h3>
       <ul>
         <li v-for="movie in recommendations" :key="movie.id">
-          <a :href="`/movies/${movie.id}`">{{ movie.title }}</a>
+          <a :href="`/movie/${movie.title_id}`">{{ movie.title }}</a>
         </li>
       </ul>
     </div>
@@ -63,7 +63,6 @@ export default {
 
       // Заполняем данные профиля
       this.userProfile = profileData.profile;
-      console.log(this.userProfile)
 
       // Фильмы, которые пользователь комментировал
       this.moviesWithReviews = profileData.movies_with_reviews;

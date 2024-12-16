@@ -13,6 +13,14 @@
       <p><strong>Рейтинг:</strong> {{ movie.rating }}</p>
       <p><strong>Количество голосов:</strong> {{ movie.votes }}</p>
       <p><strong>Продолжительность:</strong> {{ movie.duration }} минут</p>
+
+      <button 
+        v-if="isAuthenticated" 
+        @click="toggleLikeStatus"
+        :class="{ liked: liked }">
+        {{ liked ? 'Удалить из понравившихся' : 'Добавить в понравившиеся' }}
+      </button>
+      <p v-else>Войдите, чтобы добавить фильм в список понравившихся.</p>
     </header>
 
     <main>
@@ -52,7 +60,7 @@
             <p>{{ review.text }}</p>
 
             <!-- Комментарии к отзыву -->
-            <div class="comments" v-if="review.comments && review.comments.length > 0">
+            <div class="comments">
               <CommentTree
                 v-for="comment in review.comments"
                 :key="comment.id"
@@ -104,7 +112,7 @@
 <script>
 import { inject } from 'vue';
 import CommentTree from './CommentTree.vue';
-import { fetchMovieDetails } from '../api';
+import { fetchMovieDetails, toggleLike } from '../api';
 import { postComment } from '../api';
 import { postReview } from '../api';
 import { authState } from '../auth';
@@ -130,6 +138,8 @@ export default {
       this.movie = data.movie;
       this.reviews = data.reviews;
       this.user_has_reviewed = data.userHasReviewed;
+      this.liked = data.liked;
+      console.log(this.liked)
     } catch (error) {
       console.error('Ошибка при загрузке данных:', error);
     }
@@ -143,6 +153,27 @@ export default {
     },
   },
   methods: {
+    async toggleLikeStatus() {
+      if (!this.isAuthenticated) {
+        alert('Необходимо войти в аккаунт для выполнения этого действия.');
+        return;
+      }
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Не удалось получить токен. Пожалуйста, войдите заново.');
+        return;
+      }
+
+      try {
+        const result = await toggleLike(this.movie.title_id, token);
+        this.liked = result.liked; // Обновляем состояние
+        alert(result.message || (this.liked ? 'Фильм добавлен в понравившиеся!' : 'Фильм удалён из понравившихся!'));
+      } catch (error) {
+        console.error('Ошибка при переключении состояния "понравился":', error);
+        alert('Не удалось выполнить действие. Попробуйте ещё раз.');
+      }
+    },
     // Добавление отзыва
     async addReview() {
         if (!this.newReview.text || this.newReview.text.trim() === '') {

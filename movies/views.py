@@ -6,8 +6,7 @@ from django.shortcuts import get_object_or_404, render
 from .models import Movie, Review, Comment
 from .serializers import MovieSerializer, ReviewSerializer, CommentSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.authentication import TokenAuthentication
-
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class MovieListAPIView(APIView):
     def get(self, request):
@@ -21,7 +20,7 @@ class MovieListAPIView(APIView):
 
 
 class MovieDetailAPIView(APIView):
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, title_id):
@@ -33,11 +32,20 @@ class MovieDetailAPIView(APIView):
         is_authenticated = request.user.is_authenticated
         user_has_reviewed = reviews.filter(user=request.user).exists() if is_authenticated else False
         
+        print(request.user)
+        
+        liked = False
+        if is_authenticated:
+            profile = getattr(request.user, 'profile', None)
+            if profile:
+                liked = profile.liked_movies.filter(id=movie.id).exists()
+        
         data = {
             'movie': movie_serializer.data,
             'reviews': review_serializer.data,
             'isAuthenticated': is_authenticated,
             'userHasReviewed': user_has_reviewed,
+            'liked': liked,
         }
         return Response(data, status=200)
 
@@ -89,14 +97,20 @@ class CommentListCreateAPIView(APIView):
 
 
 class ToggleLikeAPIView(APIView):
+    
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, title_id):
-        movie = get_object_or_404(Movie, title_id=title_id)
+    def post(self, request, title_id, *args, **kwargs):
         profile = request.user.profile
+
+        try:
+            movie = Movie.objects.get(title_id=title_id)
+        except Movie.DoesNotExist:
+            return Response({'error': 'Фильм с указанным title_id не найден.'}, status=status.HTTP_404_NOT_FOUND)
+
         if movie in profile.liked_movies.all():
             profile.liked_movies.remove(movie)
-            return Response({"detail": "Фильм удалён из понравившихся."}, status=status.HTTP_200_OK)
+            return Response({'message': 'Фильм удалён из списка понравившихся.'}, status=status.HTTP_200_OK)
         else:
             profile.liked_movies.add(movie)
-            return Response({"detail": "Фильм добавлен в понравившиеся."}, status=status.HTTP_200_OK)
+            return Response({'message': 'Фильм добавлен в список понравившихся.'}, status=status.HTTP_200_OK)

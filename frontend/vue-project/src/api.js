@@ -56,7 +56,7 @@ export const postComment = async (reviewId, data, token) => {
 
 export const toggleLike = async (titleId, token) => {
     const response = await axios.post(
-        `${API_BASE_URL}/movies/${titleId}/like/`,
+        `${API_BASE_URL}/movies/${titleId}/toggle_like/`,
         {},
         {
             headers: { Authorization: `Bearer ${token}` },
