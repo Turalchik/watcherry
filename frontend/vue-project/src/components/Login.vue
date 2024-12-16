@@ -32,9 +32,15 @@ export default {
                     username: this.username,
                     password: this.password
                 };
+
+                // Отправляем запрос на сервер
                 const response = await loginUser(credentials);
-                localStorage.setItem('token', response.token); // Save token
-                this.$router.push('/'); // Redirect to home page
+
+                // Сохраняем токен в localStorage
+                localStorage.setItem('token', response.token); // Теперь response.token должен содержать токен
+
+                // Перенаправляем на главную страницу
+                this.$router.push('/');
             } catch (error) {
                 this.errorMessage = 'Неверный логин или пароль';
             }

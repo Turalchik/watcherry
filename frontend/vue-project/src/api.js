@@ -8,9 +8,15 @@ export const fetchPopularAndNewMovies = async () => {
 };
 
 export const fetchMovieDetails = async (titleId) => {
-    const response = await axios.get(`${API_BASE_URL}/movies/${titleId}/`);
+    const token = localStorage.getItem('token'); // Получаем токен из localStorage
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    
+    const response = await axios.get(`${API_BASE_URL}/movies/${titleId}/`, {
+      headers,
+    });
+  
     return response.data;
-};
+  };
 
 export const searchMovies = async (query) => {
     const response = await axios.get(`${API_BASE_URL}/movies/search/`, {

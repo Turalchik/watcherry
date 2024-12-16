@@ -111,32 +111,37 @@ export default {
     return {
       movie: null,
       reviews: [],
-      isAuthenticated: false, // Replace with actual authentication check
-      userHasReviewed: false, // Replace with logic to check if user has reviewed the movie
+      isAuthenticated: false, // Проверка авторизации пользователя
+      userHasReviewed: false, // Проверка, оставлял ли пользователь отзыв
       newReview: { text: '', rating: null },
-      newComment: {}, // Object to handle new comments for each review
+      newComment: {}, // Поле для хранения новых комментариев к отзывам
     };
   },
   async created() {
-    const movieId = this.$route.params.id;
-    const data = await fetchMovieDetails(movieId);
-    this.movie = data.movie;
-    this.reviews = data.reviews;
-    this.isAuthenticated = data.isAuthenticated; // Adjust based on API response
-    this.userHasReviewed = data.userHasReviewed; // Adjust based on API response
+    try {
+      const movieId = this.$route.params.id;
+      const data = await fetchMovieDetails(movieId);
+      this.movie = data.movie;
+      this.reviews = data.reviews;
+      this.isAuthenticated = data.isAuthenticated; // Используем данные из API
+      this.userHasReviewed = data.userHasReviewed; // Используем данные из API
+    } catch (error) {
+      console.error('Ошибка при загрузке данных:', error);
+    }
   },
   methods: {
     async addReview() {
-      // Implement logic to submit a review
+      // Реализация добавления отзыва
       console.log('Submitting review:', this.newReview);
     },
     async addComment(reviewId) {
-      // Implement logic to submit a comment
+      // Реализация добавления комментария
       console.log('Adding comment for review:', reviewId, this.newComment[reviewId]);
     },
   },
 };
 </script>
+
 
 <style scoped>
 /* Add styles here as needed */
