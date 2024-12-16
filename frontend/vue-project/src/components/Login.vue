@@ -36,7 +36,6 @@ export default {
 
                 // Отправляем запрос на сервер
                 const response = await loginUser(credentials);
-
                 // Сохраняем токен в localStorage
                 localStorage.setItem('token', response.token); // Теперь response.token должен содержать токен
                 authState.setAuth(true);

@@ -9,10 +9,6 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.authentication import TokenAuthentication
 
 
-def home_view(request):
-    return render(request, 'movies/home.html')
-
-
 class MovieListAPIView(APIView):
     def get(self, request):
         popular_movies = Movie.objects.order_by('-votes')[:10]

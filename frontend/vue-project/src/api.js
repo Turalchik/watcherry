@@ -16,7 +16,7 @@ export const fetchMovieDetails = async (titleId) => {
     });
   
     return response.data;
-  };
+};
 
 export const searchMovies = async (query) => {
     const response = await axios.get(`${API_BASE_URL}/movies/search/`, {
@@ -30,9 +30,22 @@ export const fetchReviews = async (titleId) => {
     return response.data;
 };
 
+// Функция для отправки отзыва
 export const postReview = async (titleId, data, token) => {
     const response = await axios.post(
         `${API_BASE_URL}/movies/${titleId}/reviews/`,
+        data,
+        {
+            headers: { Authorization: `Bearer ${token}` },
+        }
+    );
+    return response.data;
+};
+
+// Функция для отправки комментария
+export const postComment = async (reviewId, data, token) => {
+    const response = await axios.post(
+        `${API_BASE_URL}/reviews/${reviewId}/comments/`,
         data,
         {
             headers: { Authorization: `Bearer ${token}` },

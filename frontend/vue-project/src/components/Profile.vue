@@ -45,6 +45,7 @@
 
 <script>
 import { fetchUserProfile } from '../api';
+import { authState } from '../auth.js'
 
 export default {
   data() {
@@ -80,7 +81,7 @@ export default {
     logout() {
       localStorage.removeItem('token'); // Удаляем токен
       authState.setAuth(false); // Обновляем глобальное состояние авторизации
-      this.$router.push('/login'); // Перенаправляем на страницу входа
+      this.$router.push('/'); // Перенаправляем на страницу входа
     },
   },
 };

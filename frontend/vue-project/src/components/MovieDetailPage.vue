@@ -105,6 +105,8 @@
 import { inject } from 'vue';
 import CommentTree from './CommentTree.vue';
 import { fetchMovieDetails } from '../api';
+import { postComment } from '../api';
+import { postReview } from '../api';
 import { authState } from '../auth';
 
 export default {
@@ -127,7 +129,6 @@ export default {
       const data = await fetchMovieDetails(movieId);
       this.movie = data.movie;
       this.reviews = data.reviews;
-      this.authState.setAuth(data.isAuthenticated); // Устанавливаем глобальное состояние
     } catch (error) {
       console.error('Ошибка при загрузке данных:', error);
     }
@@ -136,13 +137,75 @@ export default {
     isAuthenticated() {
       return this.authState.isAuthenticated;
     },
+    userHasReviewed() {
+      if (!this.authState.user || !this.reviews) return false;
+      return this.reviews.some((review) => review.user === this.authState.user.username);
+    },
   },
   methods: {
+    // Добавление отзыва
     async addReview() {
-      console.log('Submitting review:', this.newReview);
+        if (!this.newReview.text || this.newReview.text.trim() === '') {
+            alert('Отзыв не может быть пустым.');
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Необходимо войти в аккаунт для добавления отзыва.');
+            return;
+        }
+
+        try {
+            const reviewData = { 
+                text: this.newReview.text, 
+                rating: this.newReview.rating 
+            };
+            console.log('Отправляемые данные:', reviewData);
+            const newReview = await postReview(this.movie.title_id, reviewData, token);
+
+            // Добавляем новый отзыв в список
+            this.reviews.unshift(newReview);
+            // Очищаем поля ввода
+            this.newReview = { text: '', rating: null };
+            alert('Отзыв успешно добавлен!');
+        } catch (error) {
+            console.error('Ошибка при добавлении отзыва:', error);
+            alert('Не удалось добавить отзыв. Попробуйте еще раз.');
+        }
     },
+
+    // Добавление комментария
     async addComment(reviewId) {
-      console.log('Adding comment for review:', reviewId, this.newComment[reviewId]);
+        const commentContent = this.newComment[reviewId];
+        if (!commentContent || commentContent.trim() === '') {
+            alert('Комментарий не может быть пустым.');
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Необходимо войти в аккаунт для добавления комментария.');
+            return;
+        }
+
+        try {
+            const commentData = { content: commentContent };
+            const newComment = await postComment(reviewId, commentData, token);
+
+            // Находим отзыв и добавляем комментарий в список
+            const review = this.reviews.find(r => r.id === reviewId);
+            if (review) {
+                review.comments.push(newComment);
+            }
+
+            // Очищаем поле ввода
+            this.$set(this.newComment, reviewId, '');
+            alert('Комментарий успешно добавлен!');
+        } catch (error) {
+            console.error('Ошибка при добавлении комментария:', error);
+            alert('Не удалось добавить комментарий. Попробуйте еще раз.');
+        }
     },
   },
 };
