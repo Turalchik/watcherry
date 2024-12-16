@@ -8,7 +8,7 @@ import Register from '../components/Register.vue'
 
 const routes = [
   { path: '/', component: HomePage },
-  { path: '/search', component: SearchPage },
+  { path: '/search', component: SearchPage, props: route => ({ query: route.query.q }), },
   { path: '/profile', component: ProfilePage },
   { path: '/movie/:id', component: MovieDetail, props: true },
   { path: '/login', component: Login },

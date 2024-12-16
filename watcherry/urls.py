@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('movies.urls')),
-    path('search/', include('search.urls')),
+    path('api/search/', include('search.urls')),
     path('', include('users.urls')),
     path('', include('django.contrib.auth.urls')),
 ]

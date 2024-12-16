@@ -18,6 +18,8 @@
 </template>
 
 <script>
+import { searchMovies } from '../api'; // Импортируем функцию для поиска фильмов
+
 export default {
   name: "SearchResults",
   props: {
@@ -25,10 +27,36 @@ export default {
       type: String,
       required: false,
     },
-    movies: {
-      type: Array,
-      required: true,
+  },
+  data() {
+    return {
+      movies: [], // Список фильмов, который будем заполнять из ответа
+    };
+  },
+  watch: {
+    query(newQuery) {
+      this.fetchMovies(newQuery); // Когда query изменяется, отправляем новый запрос
     },
+  },
+  methods: {
+    async fetchMovies(searchQuery) {
+      if (!searchQuery) {
+        this.movies = []; // Если query пустое, очищаем список фильмов
+        return;
+      }
+      try {
+        const results = await searchMovies(searchQuery); // Запрос к API
+        this.movies = results; // Сохраняем фильмы в локальный state
+      } catch (error) {
+        console.error('Ошибка при поиске фильмов:', error); // Обработка ошибок
+        this.movies = []; // Очищаем фильмы в случае ошибки
+      }
+    },
+  },
+  mounted() {
+    if (this.query) {
+      this.fetchMovies(this.query); // Если query есть при монтировании компонента, сразу делаем запрос
+    }
   },
 };
 </script>
