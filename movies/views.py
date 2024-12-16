@@ -31,9 +31,7 @@ class MovieDetailAPIView(APIView):
         
         is_authenticated = request.user.is_authenticated
         user_has_reviewed = reviews.filter(user=request.user).exists() if is_authenticated else False
-        
-        print(request.user)
-        
+                
         liked = False
         if is_authenticated:
             profile = getattr(request.user, 'profile', None)
