@@ -52,7 +52,7 @@
             <p>{{ review.text }}</p>
 
             <!-- Комментарии к отзыву -->
-            <div class="comments">
+            <div class="comments" v-if="review.comments && review.comments.length > 0">
               <CommentTree
                 v-for="comment in review.comments"
                 :key="comment.id"
@@ -129,6 +129,7 @@ export default {
       const data = await fetchMovieDetails(movieId);
       this.movie = data.movie;
       this.reviews = data.reviews;
+      this.user_has_reviewed = data.userHasReviewed;
     } catch (error) {
       console.error('Ошибка при загрузке данных:', error);
     }
@@ -138,8 +139,7 @@ export default {
       return this.authState.isAuthenticated;
     },
     userHasReviewed() {
-      if (!this.authState.user || !this.reviews) return false;
-      return this.reviews.some((review) => review.user === this.authState.user.username);
+      return this.user_has_reviewed;
     },
   },
   methods: {
