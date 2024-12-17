@@ -19,19 +19,22 @@ class MovieListAPIView(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+
 class MovieDetailAPIView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # Убираем JWT аутентификацию для GET-запросов (она необходима только для создания/изменения)
+    authentication_classes = []  # Здесь не требуется аутентификация для GET-запросов
+    permission_classes = [AllowAny]  # Разрешаем доступ всем пользователям для просмотра фильма
 
     def get(self, request, title_id):
         movie = get_object_or_404(Movie, title_id=title_id)
         reviews = movie.reviews.prefetch_related('comments')
         movie_serializer = MovieSerializer(movie)
         review_serializer = ReviewSerializer(reviews, many=True)
-        
+
         is_authenticated = request.user.is_authenticated
         user_has_reviewed = reviews.filter(user=request.user).exists() if is_authenticated else False
-                
+        
         liked = False
         if is_authenticated:
             profile = getattr(request.user, 'profile', None)
@@ -46,6 +49,8 @@ class MovieDetailAPIView(APIView):
             'liked': liked,
         }
         return Response(data, status=200)
+
+
 
 
 class SearchMoviesAPIView(APIView):

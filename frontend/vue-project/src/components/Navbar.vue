@@ -38,17 +38,16 @@ export default {
     async getUserProfile() {
         const token = localStorage.getItem('token'); // Получаем токен
         if (!token || token === 'undefined') {
-            console.warn('Токен отсутствует. Пользователь не авторизован.');
             this.isLoggedIn = false; // Обновляем статус
             return;
         }
+
         try {
             const profile = await fetchUserProfile(token);
             this.isLoggedIn = true;
             this.userName = profile.profile.username;  // Доступ к имени через profile.username
             console.log(profile);
         } catch (error) {
-            console.error('Ошибка получения профиля:', error);
             this.isLoggedIn = false;
         }
     },

@@ -33,24 +33,6 @@
         <p v-else>Нет информации о актерах.</p>
       </section>
 
-      <!-- Секция для режиссеров -->
-      <section>
-        <h2>Режиссеры</h2>
-        <ul v-if="movie.directors.length > 0">
-          <li v-for="director in movie.directors" :key="director.id">{{ director.name }}</li>
-        </ul>
-        <p v-else>Нет информации о режиссерах.</p>
-      </section>
-
-      <!-- Секция для продюсеров -->
-      <section>
-        <h2>Продюсеры</h2>
-        <ul v-if="movie.producers.length > 0">
-          <li v-for="producer in movie.producers" :key="producer.id">{{ producer.name }}</li>
-        </ul>
-        <p v-else>Нет информации о продюсерах.</p>
-      </section>
-
       <!-- Секция для отзывов -->
       <section>
         <h2>Отзывы</h2>
@@ -134,12 +116,14 @@ export default {
   },
   async created() {
     try {
+      const token = localStorage.getItem('token');
+      this.isAuthenticated = !!token; // если токен существует, то пользователь авторизован
       const movieId = this.$route.params.id;
       const data = await fetchMovieDetails(movieId);
       this.movie = data.movie;
       this.reviews = data.reviews || [];
       this.liked = data.liked;
-      console.log(this.liked)
+      this.userHasReviewed = data.userHasReviewed; // Получаем информацию о том, оставил ли пользователь отзыв
     } catch (error) {
       console.error('Ошибка при загрузке данных:', error);
     }
@@ -147,9 +131,6 @@ export default {
   computed: {
     isAuthenticated() {
       return this.authState?.isAuthenticated || false;
-    },
-    userHasReviewed() {
-      return this.user_has_reviewed;
     },
   },
   methods: {
@@ -244,8 +225,3 @@ export default {
   },
 };
 </script>
-
-
-<style scoped>
-/* Add styles here as needed */
-</style>
