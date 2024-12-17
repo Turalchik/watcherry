@@ -1,7 +1,7 @@
 <template>
   <div class="comment">
     <p v-if="comment && comment.user && comment.text">
-      <strong>{{ comment.user.username }}:</strong> {{ comment.text }}
+      <strong>{{ comment.user }}:</strong> {{ comment.text }}
     </p>
     <p v-else>Комментарий недоступен.</p>
 
@@ -63,17 +63,20 @@ export default {
       }
 
       // Пробрасываем событие родительскому компоненту
-      this.$emit('reply', {
+      this.$emit('comment-reply', {
         parentId: this.comment?.id || null,
         text: this.replyText.trim(),
       });
+      console.log('Emit event triggered')
 
       // Очищаем поле ответа
       this.replyText = '';
     },
     handleReply(replyData) {
       // Пробрасываем событие вверх по дереву
-      this.$emit('reply', replyData);
+      console.log('handleReply');
+      console.log(replyData);
+      this.$emit('comment-reply', replyData);
     },
   },
 };

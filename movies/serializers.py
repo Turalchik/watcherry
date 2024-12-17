@@ -36,10 +36,15 @@ class MovieSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField(read_only=True)
+    replies = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'text', 'parent', 'created_at']
+        fields = ['id', 'user', 'text', 'parent', 'replies', 'created_at']
+
+    def get_replies(self, obj):
+        replies = Comment.objects.filter(parent=obj)
+        return CommentSerializer(replies, many=True).data
 
 class ReviewSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)

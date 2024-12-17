@@ -65,6 +65,7 @@
                 v-for="comment in review.comments || []"
                 :key="comment.id"
                 :comment="comment"
+                :isAuthenticated="isAuthenticated"
               />
             </div>
 
