@@ -1,27 +1,38 @@
 <template>
   <div class="comment">
-    <p>
+    <p v-if="comment && comment.user && comment.text">
       <strong>{{ comment.user.username }}:</strong> {{ comment.text }}
     </p>
+    <p v-else>Комментарий недоступен.</p>
 
     <!-- Отображаем вложенные ответы рекурсивно -->
-    <div v-if="comment.replies.length" class="replies" style="margin-left: 20px;">
+    <div
+      v-if="Array.isArray(comment.replies) && comment.replies.length"
+      class="replies"
+    >
       <CommentTree
         v-for="reply in comment.replies"
         :key="reply.id"
         :comment="reply"
+        :isAuthenticated="isAuthenticated"
         @reply="handleReply"
       />
     </div>
 
     <!-- Форма для добавления ответа -->
-    <div v-if="isAuthenticated" style="margin-top: 5px;">
+    <div v-if="isAuthenticated" class="reply-form">
       <form @submit.prevent="submitReply">
-        <textarea v-model="replyText" placeholder="Ваш ответ" rows="2"></textarea>
+        <textarea
+          v-model="replyText"
+          placeholder="Ваш ответ"
+          rows="2"
+        ></textarea>
         <button type="submit">Ответить</button>
       </form>
     </div>
-    <p v-else>Чтобы ответить, необходимо <router-link to="/login">войти</router-link>.</p>
+    <p v-else>
+      Чтобы ответить, необходимо <router-link to="/login">войти</router-link>.
+    </p>
   </div>
 </template>
 
@@ -44,20 +55,24 @@ export default {
     };
   },
   methods: {
+    // Отправка ответа на комментарий
     async submitReply() {
-      if (!this.replyText.trim()) return;
+      if (!this.replyText.trim()) {
+        alert('Ответ не может быть пустым.');
+        return;
+      }
 
-      // Отправляем ответ родительскому компоненту
+      // Пробрасываем событие родительскому компоненту
       this.$emit('reply', {
-        parentId: this.comment.id,
-        text: this.replyText,
+        parentId: this.comment?.id || null,
+        text: this.replyText.trim(),
       });
 
       // Очищаем поле ответа
       this.replyText = '';
     },
     handleReply(replyData) {
-      // Пробрасываем событие ответа дальше наверх
+      // Пробрасываем событие вверх по дереву
       this.$emit('reply', replyData);
     },
   },
@@ -73,8 +88,11 @@ export default {
 .replies {
   margin-left: 20px;
 }
-textarea {
+.reply-form textarea {
   width: 100%;
   margin-bottom: 5px;
+}
+.reply-form button {
+  display: block;
 }
 </style>

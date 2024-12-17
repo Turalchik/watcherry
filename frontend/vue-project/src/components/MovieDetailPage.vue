@@ -60,12 +60,11 @@
             <p>{{ review.text }}</p>
 
             <!-- Комментарии к отзыву -->
-            <div class="comments">
+            <div class="comments" v-if="review.comments && review.comments.length > 0">
               <CommentTree
-                v-for="comment in review.comments"
+                v-for="comment in review.comments || []"
                 :key="comment.id"
                 :comment="comment"
-                v-if="!comment.parent"
               />
             </div>
 
@@ -110,7 +109,7 @@
 </template>
 
 <script>
-import { inject } from 'vue';
+import { inject, reactive } from 'vue';
 import CommentTree from './CommentTree.vue';
 import { fetchMovieDetails, toggleLike } from '../api';
 import { postComment } from '../api';
@@ -128,7 +127,8 @@ export default {
       movie: null,
       reviews: [],
       newReview: { text: '', rating: null },
-      newComment: {}, // Поле для хранения новых комментариев к отзывам
+      newComment: reactive({}), // Поле для хранения новых комментариев к отзывам
+      userHasReviewed: false,
     };
   },
   async created() {
@@ -136,8 +136,7 @@ export default {
       const movieId = this.$route.params.id;
       const data = await fetchMovieDetails(movieId);
       this.movie = data.movie;
-      this.reviews = data.reviews;
-      this.user_has_reviewed = data.userHasReviewed;
+      this.reviews = data.reviews || [];
       this.liked = data.liked;
       console.log(this.liked)
     } catch (error) {
@@ -146,7 +145,7 @@ export default {
   },
   computed: {
     isAuthenticated() {
-      return this.authState.isAuthenticated;
+      return this.authState?.isAuthenticated || false;
     },
     userHasReviewed() {
       return this.user_has_reviewed;
@@ -221,17 +220,20 @@ export default {
         }
 
         try {
-            const commentData = { content: commentContent };
+            const commentData = { text: commentContent };
             const newComment = await postComment(reviewId, commentData, token);
 
             // Находим отзыв и добавляем комментарий в список
             const review = this.reviews.find(r => r.id === reviewId);
             if (review) {
-                review.comments.push(newComment);
+              if (!Array.isArray(review.comments)) {
+                review.comments = []; // Инициализация, если массив отсутствует
+              }
+              review.comments.push(newComment);
             }
 
             // Очищаем поле ввода
-            this.$set(this.newComment, reviewId, '');
+            this.newComment[reviewId] = '';
             alert('Комментарий успешно добавлен!');
         } catch (error) {
             console.error('Ошибка при добавлении комментария:', error);
