@@ -2,7 +2,7 @@
   <div v-if="movie">
     <header>
       <h1>{{ movie.title }}</h1>
-      
+
       <div v-if="movie.poster_url">
         <img :src="movie.poster_url" :alt="'Постер фильма ' + movie.title" style="max-width: 300px;">
       </div>
@@ -14,8 +14,8 @@
       <p><strong>Количество голосов:</strong> {{ movie.votes }}</p>
       <p><strong>Продолжительность:</strong> {{ movie.duration }} минут</p>
 
-      <button 
-        v-if="isAuthenticated" 
+      <button
+        v-if="isAuthenticated"
         @click="toggleLikeStatus"
         :class="{ liked: liked }">
         {{ liked ? 'Удалить из понравившихся' : 'Добавить в понравившиеся' }}
@@ -42,13 +42,34 @@
             <p>{{ review.text }}</p>
 
             <!-- Комментарии к отзыву -->
-            <div class="comments" v-if="review.comments && review.comments.length > 0">
-              <CommentTree
-                v-for="comment in review.comments || []"
-                :key="comment.id"
-                :comment="comment"
-                :isAuthenticated="isAuthenticated"
-              />
+            <div v-if="review.comments && review.comments.length > 0">
+              <ul>
+                <li v-for="comment in review.comments" :key="comment.id">
+                  <p><strong>{{ comment.user }}:</strong> {{ comment.text }}</p>
+
+                  <!-- Форма для добавления ответа на комментарий -->
+                  <div v-if="isAuthenticated">
+                    <form @submit.prevent="addComment(review.id, comment.id)">
+                      <textarea
+                        :value="getNestedComment(review.id, comment.id)"
+                        @input="setNestedComment(review.id, comment.id, $event.target.value)"
+                        placeholder="Ответ на комментарий">
+                      </textarea>
+                      <button type="submit">Ответить</button>
+                    </form>
+                  </div>
+
+                  <!-- Отображение ответов на комментарий -->
+                  <div v-if="comment.replies && comment.replies.length > 0">
+                    <ul>
+                      <li v-for="reply in comment.replies" :key="reply.id">
+                        <p><strong>{{ reply.user }}:</strong> {{ reply.text }}</p>
+                      </li>
+                    </ul>
+                  </div>
+
+                </li>
+              </ul>
             </div>
 
             <!-- Форма добавления комментария -->
@@ -93,14 +114,10 @@
 
 <script>
 import { inject, reactive } from 'vue';
-import CommentTree from './CommentTree.vue';
-import { fetchMovieDetails, toggleLike } from '../api';
-import { postComment } from '../api';
-import { postReview } from '../api';
+import { fetchMovieDetails, toggleLike, postComment, postReview } from '../api';
 import { authState } from '../auth';
 
 export default {
-  components: { CommentTree },
   setup() {
     const authState = inject('authState');
     return { authState };
@@ -134,6 +151,24 @@ export default {
     },
   },
   methods: {
+
+    getNestedComment(reviewId, commentId) {
+    return this.newComment[reviewId]?.[commentId] || '';
+    },
+
+
+
+    setNestedComment(reviewId, commentId, value) {
+      if (!this.newComment[reviewId]) {
+        this.newComment[reviewId] = {}; // Создаем вложенный объект, если его еще нет
+      }
+      // Изменяем конкретный комментарий, не затрагивая остальные
+      this.newComment[reviewId][commentId] = value;
+  },
+
+
+
+
     async toggleLikeStatus() {
       if (!this.isAuthenticated) {
         alert('Необходимо войти в аккаунт для выполнения этого действия.');
@@ -155,72 +190,80 @@ export default {
         alert('Не удалось выполнить действие. Попробуйте ещё раз.');
       }
     },
+
     // Добавление отзыва
     async addReview() {
-        if (!this.newReview.text || this.newReview.text.trim() === '') {
-            alert('Отзыв не может быть пустым.');
-            return;
-        }
+      if (!this.newReview.text || this.newReview.text.trim() === '') {
+        alert('Отзыв не может быть пустым.');
+        return;
+      }
 
-        const token = localStorage.getItem('token');
-        if (!token) {
-            alert('Необходимо войти в аккаунт для добавления отзыва.');
-            return;
-        }
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Необходимо войти в аккаунт для добавления отзыва.');
+        return;
+      }
 
-        try {
-            const reviewData = { 
-                text: this.newReview.text, 
-                rating: this.newReview.rating 
-            };
-            console.log('Отправляемые данные:', reviewData);
-            const newReview = await postReview(this.movie.title_id, reviewData, token);
+      try {
+        const reviewData = { text: this.newReview.text, rating: this.newReview.rating };
+        const newReview = await postReview(this.movie.title_id, reviewData, token);
 
-            // Добавляем новый отзыв в список
-            this.reviews.unshift(newReview);
-            // Очищаем поля ввода
-            this.newReview = { text: '', rating: null };
-            alert('Отзыв успешно добавлен!');
-        } catch (error) {
-            console.error('Ошибка при добавлении отзыва:', error);
-            alert('Не удалось добавить отзыв. Попробуйте еще раз.');
-        }
+        this.reviews.unshift(newReview);
+        this.newReview = { text: '', rating: null };
+        alert('Отзыв успешно добавлен!');
+      } catch (error) {
+        console.error('Ошибка при добавлении отзыва:', error);
+        alert('Не удалось добавить отзыв. Попробуйте еще раз.');
+      }
     },
 
-    // Добавление комментария
-    async addComment(reviewId) {
-        const commentContent = this.newComment[reviewId];
-        if (!commentContent || commentContent.trim() === '') {
-            alert('Комментарий не может быть пустым.');
-            return;
-        }
+    async addComment(reviewId, parentCommentId = null) {
+      const commentContent = parentCommentId
+          ? this.newComment[reviewId]?.[parentCommentId]
+          : this.newComment[reviewId] || '';
 
-        const token = localStorage.getItem('token');
-        if (!token) {
-            alert('Необходимо войти в аккаунт для добавления комментария.');
-            return;
-        }
+      if (!commentContent || commentContent.trim() === '') {
+        alert('Комментарий не может быть пустым.');
+        return;
+      }
 
-        try {
-            const commentData = { text: commentContent };
-            const newComment = await postComment(reviewId, commentData, token);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Необходимо войти в аккаунт для добавления комментария.');
+        return;
+      }
 
-            // Находим отзыв и добавляем комментарий в список
-            const review = this.reviews.find(r => r.id === reviewId);
-            if (review) {
-              if (!Array.isArray(review.comments)) {
-                review.comments = []; // Инициализация, если массив отсутствует
-              }
-              review.comments.push(newComment);
+      try {
+        const commentData = { text: commentContent, parentId: parentCommentId };
+        const newComment = await postComment(reviewId, commentData, token);
+
+        // Обновление комментариев в объекте review
+        const review = this.reviews.find(r => r.id === reviewId);
+        if (review) {
+          if (parentCommentId) {
+            // Если это ответ на комментарий
+            const parent = review.comments.find(c => c.id === parentCommentId);
+            if (parent) {
+              parent.replies = [...(parent.replies || []), newComment]; // Добавляем в поле replies
             }
-
-            // Очищаем поле ввода
-            this.newComment[reviewId] = '';
-            alert('Комментарий успешно добавлен!');
-        } catch (error) {
-            console.error('Ошибка при добавлении комментария:', error);
-            alert('Не удалось добавить комментарий. Попробуйте еще раз.');
+          } else {
+            // Просто добавляем комментарий
+            review.comments.push(newComment);
+          }
         }
+
+        // Очищаем поле для нового комментария после добавления
+        if (parentCommentId) {
+          this.newComment[reviewId][parentCommentId] = ''; // Очистить для ответа
+        } else {
+          this.newComment[reviewId] = ''; // Очистить для основного комментария
+        }
+
+        alert('Комментарий успешно добавлен!');
+      } catch (error) {
+        console.error('Ошибка при добавлении комментария:', error);
+      }
+
     },
   },
 };

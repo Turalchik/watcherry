@@ -62,21 +62,22 @@ export default {
         return;
       }
 
-      // Пробрасываем событие родительскому компоненту
-      this.$emit('comment-reply', {
-        parentId: this.comment?.id || null,
-        text: this.replyText.trim(),
-      });
-      console.log('Emit event triggered')
+      const replyData = {
+        parent: this.comment.id,  // ID родительского комментария
+        text: this.replyText.trim(), // Текст нового ответа
+      };
 
-      // Очищаем поле ответа
-      this.replyText = '';
-    },
-    handleReply(replyData) {
-      // Пробрасываем событие вверх по дереву
-      console.log('handleReply');
-      console.log(replyData);
+      // Лог до отправки события
+      console.log('Отправка ответа: ', replyData);
+
+      // Пробрасываем событие родительскому компоненту
       this.$emit('comment-reply', replyData);
+      
+      // Лог после отправки события
+      console.log('Событие отправлено');
+
+      // Очищаем поле ввода
+      this.replyText = '';
     },
   },
 };
