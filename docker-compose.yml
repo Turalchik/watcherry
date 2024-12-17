@@ -9,15 +9,20 @@ services:
       - "8000:8000"
     volumes:
       - ./data:/app/data  # Монтируем папку с данными
-    environment:
-      DEBUG: "True"
-      DATA_DIR: "/app/data"
     command: >
-      sh -c "python3 manage.py makemigrations movies &&
-             python3 manage.py makemigrations users &&
-             python3 manage.py migrate &&
-             python3 manage.py import_movies &&
-             python3 manage.py runserver 0.0.0.0:8000"
+      sh -c "
+      python3 manage.py makemigrations movies &&
+      python3 manage.py makemigrations users &&
+      python3 manage.py migrate &&
+      python3 manage.py import_movies &&
+      python3 manage.py createsuperuser --no-input || true &&
+      python3 manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DEBUG=True
+      - DATA_DIR=/app/data
+      - DJANGO_SUPERUSER_USERNAME=Kira
+      - DJANGO_SUPERUSER_EMAIL=Kira@example.com
+      - DJANGO_SUPERUSER_PASSWORD=123456789Kira
 
   frontend:
     build:
