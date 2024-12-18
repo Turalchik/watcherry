@@ -31,7 +31,7 @@ class MovieSerializer(serializers.ModelSerializer):
         model = Movie
         fields = [
             'title_id', 'title', 'poster_url', 'release_year',
-            'rating', 'votes', 'duration', 'genres', 'actors', 'directors', 'producers'
+            'rating', 'votes', 'duration', 'genres', 'actors', 'directors', 'producers', 'votes_from_website', 'rating_from_website' 
         ]
 
 class CommentSerializer(serializers.ModelSerializer):

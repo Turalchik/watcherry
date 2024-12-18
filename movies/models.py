@@ -42,7 +42,6 @@ class Producer(models.Model):
     def __str__(self):
         return self.name
 
-
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     release_year = models.IntegerField(null=False, default=1900)
@@ -56,9 +55,12 @@ class Movie(models.Model):
     duration = models.IntegerField(null=True, blank=True)
     title_id = models.CharField(max_length=10, unique=True)
     poster_url = models.URLField(blank=True, null=True)
+    votes_from_website = models.IntegerField(default=0)  # Новое поле
+    rating_from_website = models.FloatField(default=0.0)  # Новое поле
 
     def __str__(self):
         return self.title
+
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')

@@ -21,6 +21,13 @@ class MovieListAPIView(APIView):
 
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from .models import Movie
+from .serializers import MovieSerializer, ReviewSerializer
+
 class MovieDetailAPIView(APIView):
     # Убираем JWT аутентификацию для GET-запросов (она необходима только для создания/изменения)
     authentication_classes = []  # Здесь не требуется аутентификация для GET-запросов
@@ -28,21 +35,26 @@ class MovieDetailAPIView(APIView):
 
     def get(self, request, title_id):
         movie = get_object_or_404(Movie, title_id=title_id)
-        reviews = movie.reviews.prefetch_related('comments')
+        reviews = movie.reviews.prefetch_related('comments')  # Предзагрузка комментариев для оптимизации
         movie_serializer = MovieSerializer(movie)
         review_serializer = ReviewSerializer(reviews, many=True)
 
         is_authenticated = request.user.is_authenticated
         user_has_reviewed = reviews.filter(user=request.user).exists() if is_authenticated else False
-        
+
         liked = False
         if is_authenticated:
             profile = getattr(request.user, 'profile', None)
             if profile:
                 liked = profile.liked_movies.filter(id=movie.id).exists()
-        
+
+        # Добавляем `votes_from_website` и `rating_from_website`
         data = {
-            'movie': movie_serializer.data,
+            'movie': {
+                **movie_serializer.data,
+                'votesFromWebsite': movie.votes_from_website,
+                'ratingFromWebsite': movie.rating_from_website,
+            },
             'reviews': review_serializer.data,
             'isAuthenticated': is_authenticated,
             'userHasReviewed': user_has_reviewed,
@@ -79,7 +91,6 @@ class ReviewListCreateAPIView(APIView):
             serializer.save(user=request.user, movie=movie)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 from rest_framework.views import APIView
 from rest_framework.response import Response

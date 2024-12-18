@@ -11,7 +11,9 @@
       <p><strong>Жанр:</strong> {{ movie.genres.join(', ') }}</p>
       <p><strong>Год выпуска:</strong> {{ movie.release_year }}</p>
       <p><strong>Рейтинг:</strong> {{ movie.rating }}</p>
-      <p><strong>Количество голосов:</strong> {{ movie.votes }}</p>
+      <p><strong>Рейтинг фильма на watcherry:</strong>{{ movie.rating_from_website.toFixed(1) }}</p>
+      <p><strong>Количество голосов с базы данных:</strong> {{ movie.votes }}</p>
+      <p><strong>Количество голосов на watcherry</strong>{{ movie.votes_from_website }}</p>
       <p><strong>Продолжительность:</strong> {{ movie.duration }} минут</p>
 
       <button
