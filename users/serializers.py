@@ -51,3 +51,9 @@ class RecommendationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ['title_id', 'movie', 'content', 'rating']
+
+
+class AvatarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['avatar']

@@ -12,7 +12,13 @@ from .models import Profile
 from movies.models import Movie
 from django.db.models import Q
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import status
+from .models import Profile
+from .serializers import AvatarSerializer
 
 class LoginView(TokenObtainPairView):
     permission_classes = [AllowAny]
@@ -93,13 +99,34 @@ class ProfileAPIView(generics.RetrieveAPIView):
             "recommendations": recommendations_serializer.data,
         })
 
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import check_password
 
-class ChangePasswordAPIView(generics.UpdateAPIView):
-    serializer_class = PasswordChangeSerializer
+class ChangePasswordAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get_object(self):
-        return self.request.user
+    def post(self, request):
+        user = request.user
+        current_password = request.data.get('current_password')
+        new_password = request.data.get('new_password')
+        new_password_confirm = request.data.get('new_password_confirm')
+
+        # Проверка текущего пароля
+        if not check_password(current_password, user.password):
+            return Response({'error': 'Текущий пароль неверный'}, status=400)
+
+        # Проверка совпадения нового пароля
+        if new_password != new_password_confirm:
+            return Response({'error': 'Новый пароль и его подтверждение не совпадают'}, status=400)
+
+        # Обновление пароля
+        user.set_password(new_password)
+        user.save()
+        return Response({'success': 'Пароль успешно обновлён'}, status=200)
+
 
 
 class RecommendationsAPIView(generics.ListAPIView):
@@ -132,3 +159,21 @@ def get_recommendations(user):
 
     recommendations = Movie.objects.filter(filter_criteria).exclude(id__in=liked_movies).distinct()
     return recommendations
+
+class UpdateAvatarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            profile = Profile.objects.get(user=request.user)
+        except Profile.DoesNotExist:
+            return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = AvatarSerializer(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'message': 'Avatar updated successfully',
+                'avatar': serializer.data['avatar']
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

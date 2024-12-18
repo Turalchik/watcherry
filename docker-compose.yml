@@ -9,6 +9,8 @@ services:
       - "8000:8000"
     volumes:
       - ./data:/app/data  # Монтируем папку с данными
+      - ./media:/app/media
+
     command: >
       sh -c "
       python3 manage.py makemigrations movies &&

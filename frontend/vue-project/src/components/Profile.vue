@@ -43,12 +43,28 @@
         </li>
       </ul>
     </div>
+
+     <!-- Смена пароля -->
+     <div class="change-password-section">
+      <h3>Сменить пароль</h3>
+      <form @submit.prevent="changePassword">
+        <input v-model="passwordData.current_password" type="password" placeholder="Текущий пароль" />
+        <input v-model="passwordData.new_password" type="password" placeholder="Новый пароль" />
+        <input v-model="passwordData.new_password_confirm" type="password" placeholder="Подтверждение нового пароля" />
+        <button type="submit">Изменить пароль</button>
+      </form>
+      <p v-if="passwordError" class="error">{{ passwordError }}</p>
+      <p v-if="passwordSuccess" class="success">{{ passwordSuccess }}</p>
+    </div>
+
   </div>
 </template>
 
 <script>
 import { fetchUserProfile } from '../api';
 import { authState } from '../auth.js'
+import { changePassword } from '../api';
+import axios from "axios";
 
 export default {
   data() {
@@ -57,6 +73,18 @@ export default {
       moviesWithReviews: [],
       likedMovies: [],
       recommendations: [],
+
+      passwordData: {
+        current_password: '',
+        new_password: '',
+        new_password_confirm: '',
+      },
+      passwordError: '',
+      passwordSuccess: '',
+
+      selectedFile: null,
+      avatarUrl: null,
+
     };
   },
   async mounted() {
@@ -85,6 +113,27 @@ export default {
       authState.setAuth(false); // Обновляем глобальное состояние авторизации
       this.$router.push('/'); // Перенаправляем на страницу входа
     },
+
+    async changePassword() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await changePassword(this.passwordData, token);
+        this.passwordSuccess = response.success || 'Пароль успешно изменён!';
+        this.passwordError = '';
+        this.resetPasswordForm();
+      } catch (error) {
+        this.passwordError = error.response?.data?.error || 'Ошибка при смене пароля';
+        this.passwordSuccess = '';
+      }
+    },
+    resetPasswordForm() {
+      this.passwordData = {
+        current_password: '',
+        new_password: '',
+        new_password_confirm: '',
+      };
+    },    
+
   },
 };
 </script>
