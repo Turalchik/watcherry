@@ -93,7 +93,6 @@ export const registerUser = async (userData) => {
 // Получение профиля пользователя
 export const fetchUserProfile = async (token) => {
     if (!token) {
-        alert("Токен не найден");
         return;
     }
     try {
@@ -102,8 +101,6 @@ export const fetchUserProfile = async (token) => {
         });
         return response.data;
     } catch (error) {
-        const errorMessage = error.response?.data?.detail || error.message;
-        alert(`Ошибка: ${errorMessage}`);
         throw error;
     }
 };

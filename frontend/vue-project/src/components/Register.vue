@@ -3,7 +3,6 @@
         <h1>Регистрация</h1>
         <form @submit.prevent="register">
             <input v-model="username" placeholder="Логин" />
-            <input v-model="email" type="email" placeholder="Электронная почта" />
             <input v-model="password" type="password" placeholder="Пароль" />
             <input v-model="passwordConfirm" type="password" placeholder="Подтверждение пароля" />
             <button type="submit">Зарегистрироваться</button>
@@ -24,7 +23,6 @@ export default {
     data() {
         return {
             username: '',
-            email: '',
             password: '',
             passwordConfirm: '',
             errorMessage: '',
@@ -40,21 +38,19 @@ export default {
             try {
                 const userData = {
                     username: this.username,
-                    email: this.email,
                     password: this.password
                 };
                 const response = await registerUser(userData);
                 this.successMessage = 'Регистрация прошла успешно! Теперь вы можете войти.';
-                this.errorMessage = ''; // Clear any previous error messages
-                this.resetForm(); // Reset the form fields
+                this.errorMessage = ''; // Очистка предыдущих сообщений об ошибках
+                this.resetForm(); // Сброс полей формы
             } catch (error) {
                 this.errorMessage = 'Ошибка при регистрации. Попробуйте еще раз.';
-                this.successMessage = ''; // Clear any previous success messages
+                this.successMessage = ''; // Очистка предыдущих сообщений об успехе
             }
         },
         resetForm() {
             this.username = '';
-            this.email = '';
             this.password = '';
             this.passwordConfirm = '';
         }

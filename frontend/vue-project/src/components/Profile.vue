@@ -1,5 +1,8 @@
 <template>
   <div class="profile-container">
+    <!-- Ссылка на главную страницу -->
+    <a href="/" class="back-to-home">← На главную</a>
+
     <h2>Личный кабинет</h2>
     
     <!-- Кнопка "Выйти" -->
@@ -111,5 +114,15 @@ export default {
 }
 .logout-button:hover {
   background-color: #ff7875;
+}
+.back-to-home {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #1890ff;
+  text-decoration: none;
+  font-size: 16px;
+}
+.back-to-home:hover {
+  text-decoration: underline;
 }
 </style>
