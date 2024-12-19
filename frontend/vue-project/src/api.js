@@ -18,12 +18,12 @@ export const fetchMovieDetails = async (titleId) => {
     return response.data;
 };
 
-export const searchMovies = async (movieTitle, rating) => {
+export const searchMovies = async (movieTitle, rating, movieGenre) => {
     if (!movieTitle || movieTitle.trim() === '') {
         throw new Error('Title is required for the search query.');
     }
     const response = await axios.get(`${API_BASE_URL}/search/`, {
-        params: { title: movieTitle, min_rating: rating },
+        params: { title: movieTitle, min_rating: rating, genre: movieGenre },
     });
     return response.data;
 };
@@ -145,6 +145,18 @@ export const fetchRecommendations = async (token) => {
     } catch (error) {
         const errorMessage = error.response?.data?.detail || error.message;
         alert(`Ошибка: ${errorMessage}`);
+        throw error;
+    }
+};
+
+
+export const fetchGenres = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/genres/`);
+        return response.data;
+    } catch (error) {
+        const errorMessage = error.response?.data?.detail || error.message;
+        alert(`Ошибка при получении жанров: ${errorMessage}`);
         throw error;
     }
 };

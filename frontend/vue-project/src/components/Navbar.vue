@@ -11,7 +11,14 @@
         placeholder="Введите название"
       />
       <select v-model="minRating">
+        <option value="0">Оценка</option>
         <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
+      </select>
+      <select v-model="selectedGenre">
+        <option value="">Все жанры</option>
+        <option v-for="genre in genres" :key="genre.id" :value="genre.name">
+          {{ genre.name }}
+        </option>
       </select>
       <button @click="searchMovies">Поиск</button>
     </div>
@@ -26,50 +33,66 @@
 </template>
 
 <script>
-import { fetchUserProfile } from '../api'; // Импортируем функцию для получения профиля пользователя
+import { fetchUserProfile, fetchGenres } from '../api';
 
 export default {
   data() {
     return {
-      isLoggedIn: false,  // Статус авторизации
-      userName: '',       // Никнейм пользователя
-      searchQuery: '',    // Хранение текста поискового запроса
-      minRating: 1,
+      isLoggedIn: false,
+      userName: '',
+      searchQuery: '',
+      minRating: 0,
+      selectedGenre: '',
+      genres: []
     };
   },
   methods: {
     async getUserProfile() {
-        const token = localStorage.getItem('token'); // Получаем токен
+        const token = localStorage.getItem('token');
         if (!token || token === 'undefined') {
-            this.isLoggedIn = false; // Обновляем статус
+            this.isLoggedIn = false;
             return;
         }
 
         try {
             const profile = await fetchUserProfile(token);
             this.isLoggedIn = true;
-            this.userName = profile.profile.username;  // Доступ к имени через profile.username
+            this.userName = profile.profile.username;
             console.log(profile);
         } catch (error) {
             this.isLoggedIn = false;
         }
     },
-    goToProfile() {
-      this.$router.push('/profile'); // Переход на страницу профиля
+    async fetchMovieGenres() {
+      console.log('navbar fetchGenres')
+      try {
+        const response = await fetchGenres();
+        this.genres = response;
+      } catch (error) {
+        console.error('Ошибка загрузки жанров:', error);
+      }
     },
-    performSearch() {
-      this.$router.push({ path: '/search', query: { q: this.searchQuery } }); // Обработка поискового запроса
+    goToProfile() {
+      this.$router.push('/profile');
     },
     async searchMovies() {
       const params = new URLSearchParams();
       params.append('title', this.searchQuery);
-      params.append('minRating', this.minRating);
 
+      if (this.minRating > 0) {
+        params.append('minRating', this.minRating);
+      }
+      
+      if (this.selectedGenre) {
+        params.append('genre', this.selectedGenre);
+      }
+      console.log('navbar sending params:', params);
       this.$router.push({ path: '/search', query: Object.fromEntries(params) });
     }
   },
   mounted() {
-    this.getUserProfile(); // Получаем данные пользователя при загрузке компонента
+    this.getUserProfile();
+    this.fetchMovieGenres();
   }
 };
 </script>

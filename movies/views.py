@@ -68,8 +68,22 @@ class SearchMoviesAPIView(APIView):
     def get(self, request):
         title = request.GET.get('title', '')
         min_rating = request.GET.get("min_rating", None)
-        if title and min_rating:
+        genre = request.GET.get('genre', None)
+        
+        if title and min_rating and genre:
+            movies = Movie.objects.filter(Q(title__icontains=title) & Q(rating_from_website__gte=min_rating) & Q(genres__name__icontains=genre))
+            serializer = MovieSerializer(movies, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        elif title and min_rating:
             movies = Movie.objects.filter(Q(title__icontains=title) & Q(rating_from_website__gte=min_rating))
+            serializer = MovieSerializer(movies, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        elif title and genre:
+            movies = Movie.objects.filter(Q(title__icontains=title) & Q(genres__name__icontains=genre))
+            serializer = MovieSerializer(movies, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        elif title:
+            movies = Movie.objects.filter(Q(title__icontains=title))
             serializer = MovieSerializer(movies, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif not title:
@@ -100,8 +114,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
-from .models import Comment, Review
-from .serializers import CommentSerializer
+from .models import Comment, Review, Genre
+from .serializers import CommentSerializer, GenreSerializer
+
 
 class CommentListCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -133,7 +148,6 @@ class CommentListCreateAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class ToggleLikeAPIView(APIView):
     
     permission_classes = [IsAuthenticated]
@@ -152,3 +166,12 @@ class ToggleLikeAPIView(APIView):
         else:
             profile.liked_movies.add(movie)
             return Response({'message': 'Фильм добавлен в список понравившихся.'}, status=status.HTTP_200_OK)
+
+
+class GenreListAPIView(APIView):
+    permission_classes = [AllowAny] 
+
+    def get(self, request):
+        genres = Genre.objects.all()
+        serializer = GenreSerializer(genres, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

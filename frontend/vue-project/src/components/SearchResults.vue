@@ -2,7 +2,18 @@
   <div>
     <h1>Результаты поиска</h1>
     <div v-if="query">
-      <p>Результаты для запроса: "{{ title }}" {{ minRating }}/10</p>
+      <p v-if="title && minRating && genre">
+        Результаты для запроса: "{{ title }}" с рейтингом от {{ minRating }} и жанром "{{ genre }}"
+      </p>
+      <p v-else-if="title && minRating">
+        Результаты для запроса: "{{ title }}" с рейтингом от {{ minRating }}
+      </p>
+      <p v-else-if="title && genre">
+        Результаты для запроса: "{{ title }}" и жанром "{{ genre }}"
+      </p>
+      <p v-else-if="title">
+        Результаты для запроса: "{{ title }}"
+      </p>
       <div class="movie-list" v-if="movies.length">
         <div class="movie-item" v-for="movie in movies" :key="movie.title_id">
           <a :href="`/movie/${movie.title_id}`">
@@ -18,7 +29,7 @@
 </template>
 
 <script>
-import { searchMovies } from '../api'; // Импортируем функцию для поиска фильмов
+import { searchMovies } from '../api';
 
 export default {
   name: "SearchResults",
@@ -27,11 +38,12 @@ export default {
       movies: [],
       title: '',
       minRating: 1,
+      genre: '',
     };
   },
   computed: {
     query() {
-      return this.title || this.minRating;
+      return this.title || this.minRating || this.genre;
     },
   },
   watch: {
@@ -39,20 +51,24 @@ export default {
       immediate: true,
       handler(newQuery) {
         this.title = newQuery.title || '';
-        this.minRating = Number(newQuery.minRating) || 1;
-        this.fetchMovies({ title: this.title, minRating: this.minRating });
+        this.minRating = Number(newQuery.minRating) || 0;
+        this.genre = newQuery.genre || '';
+        this.fetchMovies({ title: this.title, minRating: this.minRating, genre: this.genre });
       },
     },
   },
   methods: {
     async fetchMovies(searchQuery) {
+      console.log('search results got:', searchQuery);
       if (!searchQuery.title) {
         console.warn('Поисковой запрос пуст. Пропускаем запрос к API.');
         this.movies = [];
         return;
       }
       try {
-        const results = await searchMovies(searchQuery.title, searchQuery.minRating);
+        console.log('fetching');
+        const results = await searchMovies(searchQuery.title, searchQuery.minRating, searchQuery.genre);
+        console.log('results:', results);
         this.movies = results;
       } catch (error) {
         console.error('Ошибка при поиске фильмов:', error);
@@ -66,13 +82,13 @@ export default {
 <style scoped>
 .movie-list {
   display: flex;
-  flex-wrap: wrap; /* Перенос элементов на новую строку, если они не помещаются */
-  gap: 20px; /* Промежуток между элементами */
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .movie-item {
   text-align: center;
-  width: 150px; /* Ограничение ширины каждого элемента */
+  width: 150px;
 }
 
 .movie-item img {
