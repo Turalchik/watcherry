@@ -18,10 +18,12 @@ export const fetchMovieDetails = async (titleId) => {
     return response.data;
 };
 
-
-export const searchMovies = async (query) => {
+export const searchMovies = async (movieTitle, rating) => {
+    if (!movieTitle || movieTitle.trim() === '') {
+        throw new Error('Title is required for the search query.');
+    }
     const response = await axios.get(`${API_BASE_URL}/search/`, {
-        params: { q: query },
+        params: { title: movieTitle, min_rating: rating },
     });
     return response.data;
 };

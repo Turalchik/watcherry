@@ -2,7 +2,7 @@
   <div>
     <h1>Результаты поиска</h1>
     <div v-if="query">
-      <p>Результаты для запроса: "{{ query }}"</p>
+      <p>Результаты для запроса: "{{ title }}" {{ minRating }}/10</p>
       <div class="movie-list" v-if="movies.length">
         <div class="movie-item" v-for="movie in movies" :key="movie.title_id">
           <a :href="`/movie/${movie.title_id}`">
@@ -22,41 +22,43 @@ import { searchMovies } from '../api'; // Импортируем функцию 
 
 export default {
   name: "SearchResults",
-  props: {
-    query: {
-      type: String,
-      required: false,
-    },
-  },
   data() {
     return {
-      movies: [], // Список фильмов, который будем заполнять из ответа
+      movies: [],
+      title: '',
+      minRating: 1,
     };
   },
+  computed: {
+    query() {
+      return this.title || this.minRating;
+    },
+  },
   watch: {
-    query(newQuery) {
-      this.fetchMovies(newQuery); // Когда query изменяется, отправляем новый запрос
+    '$route.query': {
+      immediate: true,
+      handler(newQuery) {
+        this.title = newQuery.title || '';
+        this.minRating = Number(newQuery.minRating) || 1;
+        this.fetchMovies({ title: this.title, minRating: this.minRating });
+      },
     },
   },
   methods: {
     async fetchMovies(searchQuery) {
-      if (!searchQuery) {
-        this.movies = []; // Если query пустое, очищаем список фильмов
+      if (!searchQuery.title) {
+        console.warn('Поисковой запрос пуст. Пропускаем запрос к API.');
+        this.movies = [];
         return;
       }
       try {
-        const results = await searchMovies(searchQuery); // Запрос к API
-        this.movies = results; // Сохраняем фильмы в локальный state
+        const results = await searchMovies(searchQuery.title, searchQuery.minRating);
+        this.movies = results;
       } catch (error) {
-        console.error('Ошибка при поиске фильмов:', error); // Обработка ошибок
-        this.movies = []; // Очищаем фильмы в случае ошибки
+        console.error('Ошибка при поиске фильмов:', error);
+        this.movies = [];
       }
     },
-  },
-  mounted() {
-    if (this.query) {
-      this.fetchMovies(this.query); // Если query есть при монтировании компонента, сразу делаем запрос
-    }
   },
 };
 </script>

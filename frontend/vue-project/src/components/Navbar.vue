@@ -5,13 +5,15 @@
       <!-- Кнопка для перехода на главную страницу -->
       <router-link to="/" class="navbar-button">Главная</router-link>
       <!-- Поле для ввода поискового запроса -->
-      <input
-        v-model="searchQuery"
-        @keydown.enter="performSearch"
-        class="navbar-input"
-        type="text"
-        placeholder="Введите запрос для поиска"
+      <input 
+        type="text" 
+        v-model="searchQuery" 
+        placeholder="Введите название"
       />
+      <select v-model="minRating">
+        <option v-for="n in 10" :key="n" :value="n">{{ n }}</option>
+      </select>
+      <button @click="searchMovies">Поиск</button>
     </div>
     <div class="navbar-right">
       <!-- Кнопка для перехода в личный кабинет или кнопка "Вход" -->
@@ -32,6 +34,7 @@ export default {
       isLoggedIn: false,  // Статус авторизации
       userName: '',       // Никнейм пользователя
       searchQuery: '',    // Хранение текста поискового запроса
+      minRating: 1,
     };
   },
   methods: {
@@ -57,6 +60,13 @@ export default {
     performSearch() {
       this.$router.push({ path: '/search', query: { q: this.searchQuery } }); // Обработка поискового запроса
     },
+    async searchMovies() {
+      const params = new URLSearchParams();
+      params.append('title', this.searchQuery);
+      params.append('minRating', this.minRating);
+
+      this.$router.push({ path: '/search', query: Object.fromEntries(params) });
+    }
   },
   mounted() {
     this.getUserProfile(); // Получаем данные пользователя при загрузке компонента

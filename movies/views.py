@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404, render
+from django.db.models import Q
 from .models import Movie, Review, Comment
 from .serializers import MovieSerializer, ReviewSerializer, CommentSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -63,16 +64,18 @@ class MovieDetailAPIView(APIView):
         return Response(data, status=200)
 
 
-
-
 class SearchMoviesAPIView(APIView):
     def get(self, request):
-        query = request.GET.get('q', '')
-        if query:
-            movies = Movie.objects.filter(title__icontains=query)
+        title = request.GET.get('title', '')
+        min_rating = request.GET.get("min_rating", None)
+        if title and min_rating:
+            movies = Movie.objects.filter(Q(title__icontains=title) & Q(rating_from_website__gte=min_rating))
             serializer = MovieSerializer(movies, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({"detail": "Введите запрос для поиска."}, status=status.HTTP_400_BAD_REQUEST)
+        elif not title:
+            return Response({"detail": "Введите название для поиска."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"detail": "Введите запрос для поиска."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReviewListCreateAPIView(APIView):
