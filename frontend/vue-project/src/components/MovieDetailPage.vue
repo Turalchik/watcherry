@@ -8,7 +8,7 @@
       </div>
       <p v-else>Постер не доступен.</p>
 
-      <p><strong>Жанр:</strong> {{ movie.genres.join(', ') }}</p>
+      <p><strong>Жанр:</strong> {{ movie.genres.map(genre => genre.name).join(', ') }}</p>
       <p><strong>Год выпуска:</strong> {{ movie.release_year }}</p>
       <p><strong>Рейтинг:</strong> {{ movie.rating }}</p>
       <p><strong>Рейтинг фильма на watcherry:</strong>{{ movie.rating_from_website.toFixed(1) }}</p>
@@ -140,6 +140,8 @@ export default {
       const movieId = this.$route.params.id;
       const data = await fetchMovieDetails(movieId);
       this.movie = data.movie;
+      console.log(this.movie)
+      console.log(this.movie.genres)
       this.reviews = data.reviews || [];
       this.liked = data.liked;
       this.userHasReviewed = data.userHasReviewed; // Получаем информацию о том, оставил ли пользователь отзыв
