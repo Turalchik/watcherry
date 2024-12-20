@@ -42,11 +42,11 @@ export default {
                 };
                 const response = await registerUser(userData);
                 this.successMessage = 'Регистрация прошла успешно! Теперь вы можете войти.';
-                this.errorMessage = ''; // Очистка предыдущих сообщений об ошибках
-                this.resetForm(); // Сброс полей формы
+                this.errorMessage = '';
+                this.resetForm();
             } catch (error) {
                 this.errorMessage = 'Ошибка при регистрации. Попробуйте еще раз.';
-                this.successMessage = ''; // Очистка предыдущих сообщений об успехе
+                this.successMessage = '';
             }
         },
         resetForm() {

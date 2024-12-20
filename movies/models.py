@@ -55,8 +55,8 @@ class Movie(models.Model):
     duration = models.IntegerField(null=True, blank=True)
     title_id = models.CharField(max_length=10, unique=True)
     poster_url = models.URLField(blank=True, null=True)
-    votes_from_website = models.IntegerField(default=0)  # Новое поле
-    rating_from_website = models.FloatField(default=0.0)  # Новое поле
+    votes_from_website = models.IntegerField(default=0)
+    rating_from_website = models.FloatField(default=0.0)
 
     def __str__(self):
         return self.title
@@ -70,7 +70,7 @@ class Review(models.Model):
     created_at = models.DateTimeField(default=timezone.now) 
 
     class Meta:
-        unique_together = ('user', 'movie')  # Уникальное ограничение: один пользователь - один отзыв на фильм
+        unique_together = ('user', 'movie')
 
     def __str__(self):
         return f'Review by {self.user.username} for {self.movie.title}'
@@ -82,7 +82,7 @@ class Comment(models.Model):
     review = models.ForeignKey(Review, related_name='comments', on_delete=models.CASCADE)
     parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    deleted = models.BooleanField(default=False)  # Флаг, указывающий, был ли комментарий удален
+    deleted = models.BooleanField(default=False)
 
     def __str__(self):
         if self.deleted:

@@ -1,20 +1,16 @@
 <template>
   <div class="profile-container">
-    <!-- Ссылка на главную страницу -->
     <a href="/" class="back-to-home">← На главную</a>
 
     <h2>Личный кабинет</h2>
     
-    <!-- Кнопка "Выйти" -->
     <button class="logout-button" @click="logout">Выйти</button>
     
-    <!-- Личная информация -->
     <div class="profile-info">
       <img :src="userProfile.avatar_url" alt="Аватар" class="avatar" />
       <p>Никнейм: {{ userProfile.username }}</p>
     </div>
 
-    <!-- Фильмы, которые пользователь комментировал -->
     <div v-if="moviesWithReviews.length" class="movies-section">
       <h3>Фильмы, которые вы комментировали:</h3>
       <ul>
@@ -24,7 +20,6 @@
       </ul>
     </div>
 
-    <!-- Понравившиеся фильмы -->
     <div v-if="likedMovies.length" class="movies-section">
       <h3>Понравившиеся фильмы:</h3>
       <ul>
@@ -34,7 +29,6 @@
       </ul>
     </div>
 
-    <!-- Рекомендации -->
     <div v-if="recommendations.length" class="movies-section">
       <h3>Рекомендации для вас:</h3>
       <ul>
@@ -44,7 +38,6 @@
       </ul>
     </div>
 
-     <!-- Смена пароля -->
      <div class="change-password-section">
       <h3>Сменить пароль</h3>
       <form @submit.prevent="changePassword">
@@ -92,16 +85,12 @@ export default {
       const token = localStorage.getItem('token');
       const profileData = await fetchUserProfile(token);
 
-      // Заполняем данные профиля
       this.userProfile = profileData.profile;
 
-      // Фильмы, которые пользователь комментировал
       this.moviesWithReviews = profileData.movies_with_reviews;
 
-      // Понравившиеся фильмы
       this.likedMovies = profileData.liked_movies;
 
-      // Рекомендованные фильмы
       this.recommendations = profileData.recommendations;
     } catch (error) {
       console.error('Ошибка получения профиля:', error);
@@ -109,9 +98,9 @@ export default {
   },
   methods: {
     logout() {
-      localStorage.removeItem('token'); // Удаляем токен
-      authState.setAuth(false); // Обновляем глобальное состояние авторизации
-      this.$router.push('/'); // Перенаправляем на страницу входа
+      localStorage.removeItem('token');
+      authState.setAuth(false);
+      this.$router.push('/');
     },
 
     async changePassword() {

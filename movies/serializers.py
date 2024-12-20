@@ -48,7 +48,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
-    user = serializers.StringRelatedField(read_only=True)  # Отображает имя пользователя
+    user = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Review

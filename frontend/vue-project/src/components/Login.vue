@@ -16,7 +16,7 @@
 
 <script>
 import { loginUser } from '../api';
-import { authState } from '../auth'; // Импорт глобального состояния
+import { authState } from '../auth';
 
 export default {
     data() {
@@ -34,12 +34,9 @@ export default {
                     password: this.password
                 };
 
-                // Отправляем запрос на сервер
                 const response = await loginUser(credentials);
-                // Сохраняем токен в localStorage
-                localStorage.setItem('token', response.token); // Теперь response.token должен содержать токен
+                localStorage.setItem('token', response.token);
                 authState.setAuth(true);
-                // Перенаправляем на главную страницу
                 this.$router.push('/');
             } catch (error) {
                 this.errorMessage = 'Неверный логин или пароль';

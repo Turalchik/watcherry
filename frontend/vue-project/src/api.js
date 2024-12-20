@@ -8,7 +8,7 @@ export const fetchPopularAndNewMovies = async () => {
 };
 
 export const fetchMovieDetails = async (titleId) => {
-    const token = localStorage.getItem('token'); // Получаем токен из localStorage
+    const token = localStorage.getItem('token');
     const headers = token ? { Authorization: `Bearer ${token}` } : {};
     
     const response = await axios.get(`${API_BASE_URL}/movies/${titleId}/`, {
@@ -33,7 +33,6 @@ export const fetchReviews = async (titleId) => {
     return response.data;
 };
 
-// Функция для отправки отзыва
 export const postReview = async (titleId, data, token) => {
     const response = await axios.post(
         `${API_BASE_URL}/movies/${titleId}/reviews/`,
@@ -45,7 +44,6 @@ export const postReview = async (titleId, data, token) => {
     return response.data;
 };
 
-// Функция для отправки комментария
 export const postComment = async (reviewId, data, token) => {
     const response = await axios.post(
         `${API_BASE_URL}/reviews/${reviewId}/comments/`,
@@ -68,7 +66,6 @@ export const toggleLike = async (titleId, token) => {
     return response.data;
 };
 
-// Вход пользователя
 export const loginUser = async (credentials) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/login/`, credentials);
@@ -80,7 +77,6 @@ export const loginUser = async (credentials) => {
     }
 };
 
-// Регистрация пользователя
 export const registerUser = async (userData) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/register/`, userData);
@@ -92,7 +88,6 @@ export const registerUser = async (userData) => {
     }
 };
 
-// Получение профиля пользователя
 export const fetchUserProfile = async (token) => {
     if (!token) {
         return;
@@ -107,7 +102,6 @@ export const fetchUserProfile = async (token) => {
     }
 };
 
-// Обновление профиля пользователя
 export const updateUserProfile = async (profileData, token) => {
     try {
         const response = await axios.put(`${API_BASE_URL}/profile/`, profileData, {
@@ -121,7 +115,6 @@ export const updateUserProfile = async (profileData, token) => {
     }
 };
 
-// Смена пароля
 export const changePassword = async (passwordData, token) => {
     try {
         const response = await axios.post(`${API_BASE_URL}/change-password/`, passwordData, {
@@ -135,7 +128,6 @@ export const changePassword = async (passwordData, token) => {
     }
 };
 
-// Получение рекомендаций
 export const fetchRecommendations = async (token) => {
     try {
         const response = await axios.get(`${API_BASE_URL}/recommendations/`, {

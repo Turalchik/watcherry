@@ -2,9 +2,7 @@
 <template>
   <nav class="navbar">
     <div class="navbar-left">
-      <!-- Кнопка для перехода на главную страницу -->
       <router-link to="/" class="navbar-button">Главная</router-link>
-      <!-- Поле для ввода поискового запроса -->
       <input 
         type="text" 
         v-model="searchQuery" 
@@ -23,7 +21,6 @@
       <button @click="searchMovies">Поиск</button>
     </div>
     <div class="navbar-right">
-      <!-- Кнопка для перехода в личный кабинет или кнопка "Вход" -->
       <button v-if="isLoggedIn" @click="goToProfile" class="navbar-button">
         {{ userName }}
       </button>

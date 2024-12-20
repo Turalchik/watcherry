@@ -4,6 +4,6 @@ import App from './App.vue';
 import router from './router';
 
 const app = createApp(App);
-app.provide('authState', authState); // Предоставляем глобальное состояние
+app.provide('authState', authState);
 app.use(router);
 app.mount('#app');

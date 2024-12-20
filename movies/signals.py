@@ -6,7 +6,7 @@ from .models import Review, Movie
 @receiver(post_save, sender=Review)
 def update_movie_rating(sender, instance, **kwargs):
     movie = instance.movie
-    reviews = movie.reviews.all()  # Получаем все отзывы для фильма
+    reviews = movie.reviews.all()
     total_votes = reviews.count()
     average_rating = reviews.aggregate(avg_rating=Avg('rating'))['avg_rating'] or 0
 

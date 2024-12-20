@@ -5,7 +5,6 @@
     </p>
     <p v-else>Комментарий недоступен.</p>
 
-    <!-- Отображаем вложенные ответы рекурсивно -->
     <div
       v-if="Array.isArray(comment.replies) && comment.replies.length"
       class="replies"
@@ -19,7 +18,6 @@
       />
     </div>
 
-    <!-- Форма для добавления ответа -->
     <div v-if="isAuthenticated" class="reply-form">
       <form @submit.prevent="submitReply">
         <textarea
@@ -55,7 +53,6 @@ export default {
     };
   },
   methods: {
-    // Отправка ответа на комментарий
     async submitReply() {
       if (!this.replyText.trim()) {
         alert('Ответ не может быть пустым.');
@@ -63,20 +60,16 @@ export default {
       }
 
       const replyData = {
-        parent: this.comment.id,  // ID родительского комментария
-        text: this.replyText.trim(), // Текст нового ответа
+        parent: this.comment.id,
+        text: this.replyText.trim(),
       };
 
-      // Лог до отправки события
       console.log('Отправка ответа: ', replyData);
 
-      // Пробрасываем событие родительскому компоненту
       this.$emit('comment-reply', replyData);
       
-      // Лог после отправки события
       console.log('Событие отправлено');
 
-      // Очищаем поле ввода
       this.replyText = '';
     },
   },

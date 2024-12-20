@@ -26,7 +26,6 @@
     </header>
 
     <main>
-      <!-- Секция для актеров -->
       <section>
         <h2>Актеры</h2>
         <ul v-if="movie.actors.length > 0">
@@ -35,7 +34,6 @@
         <p v-else>Нет информации о актерах.</p>
       </section>
 
-      <!-- Секция для отзывов -->
       <section>
         <h2>Отзывы</h2>
         <ul v-if="reviews.length > 0">
@@ -43,13 +41,11 @@
             <p><strong>{{ review.user }}:</strong> {{ review.rating }} / 10</p>
             <p>{{ review.text }}</p>
 
-            <!-- Комментарии к отзыву -->
             <div v-if="review.comments && review.comments.length > 0">
               <ul>
                 <li v-for="comment in review.comments" :key="comment.id">
                   <p><strong>{{ comment.user }}:</strong> {{ comment.text }}</p>
 
-                  <!-- Форма для добавления ответа на комментарий -->
                   <div v-if="isAuthenticated">
                     <form @submit.prevent="addComment(review.id, comment.id)">
                       <textarea
@@ -61,7 +57,6 @@
                     </form>
                   </div>
 
-                  <!-- Отображение ответов на комментарий -->
                   <div v-if="comment.replies && comment.replies.length > 0">
                     <ul>
                       <li v-for="reply in comment.replies" :key="reply.id">
@@ -74,7 +69,6 @@
               </ul>
             </div>
 
-            <!-- Форма добавления комментария -->
             <div v-if="isAuthenticated">
               <form @submit.prevent="addComment(review.id)">
                 <textarea v-model="newComment[review.id]" placeholder="Ваш комментарий"></textarea>
@@ -87,7 +81,6 @@
         <p v-else>Нет отзывов для этого фильма.</p>
       </section>
 
-      <!-- Форма для добавления отзыва -->
       <section>
         <div v-if="isAuthenticated">
           <div v-if="userHasReviewed">
@@ -105,7 +98,6 @@
         <p v-else>Чтобы оставить отзыв, необходимо <router-link to="/login">войти</router-link>.</p>
       </section>
 
-      <!-- Ссылка на главную -->
       <router-link to="/">На главную</router-link>
     </main>
   </div>
@@ -129,14 +121,14 @@ export default {
       movie: null,
       reviews: [],
       newReview: { text: '', rating: null },
-      newComment: reactive({}), // Поле для хранения новых комментариев к отзывам
+      newComment: reactive({}),
       userHasReviewed: false,
     };
   },
   async created() {
     try {
       const token = localStorage.getItem('token');
-      this.isAuthenticated = !!token; // если токен существует, то пользователь авторизован
+      this.isAuthenticated = !!token;
       const movieId = this.$route.params.id;
       const data = await fetchMovieDetails(movieId);
       this.movie = data.movie;
@@ -144,7 +136,7 @@ export default {
       console.log(this.movie.genres)
       this.reviews = data.reviews || [];
       this.liked = data.liked;
-      this.userHasReviewed = data.userHasReviewed; // Получаем информацию о том, оставил ли пользователь отзыв
+      this.userHasReviewed = data.userHasReviewed;
     } catch (error) {
       console.error('Ошибка при загрузке данных:', error);
     }
@@ -164,14 +156,10 @@ export default {
 
     setNestedComment(reviewId, commentId, value) {
       if (!this.newComment[reviewId]) {
-        this.newComment[reviewId] = {}; // Создаем вложенный объект, если его еще нет
+        this.newComment[reviewId] = {};
       }
-      // Изменяем конкретный комментарий, не затрагивая остальные
       this.newComment[reviewId][commentId] = value;
   },
-
-
-
 
     async toggleLikeStatus() {
       if (!this.isAuthenticated) {
@@ -187,7 +175,7 @@ export default {
 
       try {
         const result = await toggleLike(this.movie.title_id, token);
-        this.liked = result.liked; // Обновляем состояние
+        this.liked = result.liked;
         alert(result.message || (this.liked ? 'Фильм добавлен в понравившиеся!' : 'Фильм удалён из понравившихся!'));
       } catch (error) {
         console.error('Ошибка при переключении состояния "понравился":', error);
@@ -195,7 +183,6 @@ export default {
       }
     },
 
-    // Добавление отзыва
     async addReview() {
       if (!this.newReview.text || this.newReview.text.trim() === '') {
         alert('Отзыв не может быть пустым.');
@@ -241,26 +228,22 @@ export default {
         const commentData = { text: commentContent, parentId: parentCommentId };
         const newComment = await postComment(reviewId, commentData, token);
 
-        // Обновление комментариев в объекте review
         const review = this.reviews.find(r => r.id === reviewId);
         if (review) {
           if (parentCommentId) {
-            // Если это ответ на комментарий
             const parent = review.comments.find(c => c.id === parentCommentId);
             if (parent) {
-              parent.replies = [...(parent.replies || []), newComment]; // Добавляем в поле replies
+              parent.replies = [...(parent.replies || []), newComment];
             }
           } else {
-            // Просто добавляем комментарий
             review.comments.push(newComment);
           }
         }
 
-        // Очищаем поле для нового комментария после добавления
         if (parentCommentId) {
-          this.newComment[reviewId][parentCommentId] = ''; // Очистить для ответа
+          this.newComment[reviewId][parentCommentId] = '';
         } else {
-          this.newComment[reviewId] = ''; // Очистить для основного комментария
+          this.newComment[reviewId] = '';
         }
 
         alert('Комментарий успешно добавлен!');
